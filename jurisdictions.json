@@ -1,0 +1,136 @@
+{
+  "reviewed": "2026-11-15",
+  "reviewer": "Cursor, pages opened via search, Australia/Brisbane",
+  "notice": "General information, not legal advice. A 14-day line in a letter is the person's own deadline, not a statutory period. Statutory clocks below are only what the named official page said on the review date.",
+  "jurisdictions": [
+    {
+      "id": "AU",
+      "name": "Australia",
+      "access_right": "APP 12",
+      "access_clock": "Organisation: a reasonable period; OAIC thinks 30 days is reasonable. Agency: 30 days.",
+      "access_url": "https://www.oaic.gov.au/privacy/your-privacy-rights/your-personal-information/access-your-personal-information",
+      "law_url": "https://www.oaic.gov.au/privacy/australian-privacy-principles/australian-privacy-principles-guidelines/chapter-12-app-12-access-to-personal-information",
+      "complain_first": "The organisation. Some sectors must use an external dispute scheme before the OAIC (energy, water, financial services, telecommunications, some transport, some tolls).",
+      "regulator_name": "Office of the Australian Information Commissioner",
+      "regulator_url": "https://www.oaic.gov.au/privacy/privacy-complaints/lodge-a-privacy-complaint-with-us",
+      "regulator_form": "https://webform.oaic.gov.au/prod/?entitytype=Complaint&layoutcode=ComplaintWF",
+      "regulator_when": "No response within 30 days, or the response is unsatisfactory. Complaint must be in writing.",
+      "also_report": [
+        {
+          "name": "ReportCyber",
+          "url": "https://www.cyber.gov.au/submit-a-report",
+          "note": "Prefer this page. reportapp.cyber.gov.au returned a browser error on 15 Nov 2026. Phone 1300 292 371."
+        },
+        {
+          "name": "Scamwatch",
+          "url": "https://portal.scamwatch.gov.au/report-a-scam/",
+          "note": "Not a police report. Do not link a generic ACCC homepage for a lockout."
+        },
+        {
+          "name": "IDCARE",
+          "url": "https://www.idcare.org/",
+          "note": "Support, not a regulator. 1800 595 160. Homepage on 15 Nov 2026 said a Microsoft Outlook outage was delaying email replies."
+        }
+      ]
+    },
+    {
+      "id": "NZ",
+      "name": "New Zealand",
+      "access_right": "IPP 6",
+      "access_clock": "Use the Privacy Commissioner's response-date calculator. Do not invent a day count in the Kit.",
+      "access_url": "https://www.privacy.org.nz/",
+      "law_url": "https://www.privacy.org.nz/your-rights/making-a-complaint-to-the-privacy-commissioner/",
+      "complain_first": "The agency. The Commissioner says a complaint that skipped this step will not be accepted.",
+      "regulator_name": "Office of the Privacy Commissioner",
+      "regulator_url": "https://www.privacy.org.nz/your-rights/making-a-complaint-to-the-privacy-commissioner/",
+      "regulator_form": null,
+      "regulator_when": "After the agency step. The Commissioner's page says an investigation queue of at least six months.",
+      "also_report": [
+        {
+          "name": "Netsafe",
+          "url": "https://netsafe.org.nz/report/scams",
+          "note": "Scams, not a privacy complaint. 0508 638 723."
+        }
+      ]
+    },
+    {
+      "id": "UK",
+      "name": "United Kingdom",
+      "access_right": "UK GDPR Art 15",
+      "access_clock": "ICO: follow up if it has been over one month.",
+      "access_url": "https://ico.org.uk/for-the-public/getting-copies-of-your-information-subject-access-request/what-to-do-if-you-dont-get-a-response-or-youre-unhappy-with-it",
+      "law_url": "https://ico.org.uk/for-the-public/how-to-make-a-data-protection-complaint/",
+      "complain_first": "The organisation, as a data protection complaint.",
+      "regulator_name": "Information Commissioner's Office",
+      "regulator_url": "https://ico.org.uk/make-a-complaint",
+      "regulator_form": null,
+      "regulator_when": "Within three months of the last meaningful contact with the organisation. ICO says it cannot represent the person and cannot award compensation.",
+      "also_report": [
+        {
+          "name": "Action Fraud",
+          "url": "https://www.actionfraud.police.uk/how-to-report-fraud",
+          "note": "Fraud and cyber crime. 0300 123 2040. A data-breach report here is not automatically an ICO report."
+        }
+      ]
+    },
+    {
+      "id": "EU",
+      "name": "European Union",
+      "access_right": "GDPR Art 15",
+      "access_clock": "Do not hard-code a day count. The national authority's page governs.",
+      "access_url": "https://www.edpb.europa.eu/about-edpb/our-members_en",
+      "law_url": "https://www.edpb.europa.eu/about-edpb/our-members_en",
+      "complain_first": "The organisation, then the national data protection authority.",
+      "regulator_name": "National data protection authority (not the EDPB)",
+      "regulator_url": "https://www.edpb.europa.eu/about-edpb/our-members_en",
+      "regulator_form": "https://www.edpb.europa.eu/contact/file-a-complaint_en",
+      "regulator_when": "The EDPB page sends the person to the authority where they live, work, or where it happened.",
+      "also_report": []
+    },
+    {
+      "id": "US",
+      "name": "United States",
+      "access_right": "No single federal access clock recorded in this pass",
+      "access_clock": "Do not invent one. State law differs.",
+      "access_url": null,
+      "law_url": null,
+      "complain_first": "The company, in the letter the Kit drafts.",
+      "regulator_name": "Federal Trade Commission",
+      "regulator_url": "https://reportfraud.ftc.gov/",
+      "regulator_form": "https://reportfraud.ftc.gov/",
+      "regulator_when": "ReportFraud says it cannot resolve the individual report. It shares reports with law enforcers.",
+      "also_report": [
+        {
+          "name": "IdentityTheft.gov",
+          "url": "https://www.identitytheft.gov/",
+          "note": "Identity theft only. A knowingly false report is a crime under the page's own warning."
+        },
+        {
+          "name": "IC3",
+          "url": "https://www.ic3.gov/",
+          "note": "Cyber-enabled crime. IC3 warns that impersonators ask for money. Immediate danger: local emergency services, not this form."
+        }
+      ]
+    },
+    {
+      "id": "CA",
+      "name": "Canada",
+      "access_right": "PIPEDA s 4.9, as named in the RX",
+      "access_clock": "Not copied. The OPC access page was not opened in this pass.",
+      "access_url": null,
+      "law_url": null,
+      "complain_first": "The organisation.",
+      "regulator_name": "Office of the Privacy Commissioner of Canada",
+      "regulator_url": "https://www.priv.gc.ca/en/report-a-concern/",
+      "regulator_form": null,
+      "regulator_when": "After the organisation. OPC says formal-complaint processing is delayed by several months.",
+      "also_report": [
+        {
+          "name": "Canadian Anti-Fraud Centre",
+          "url": null,
+          "note": "Not confirmed on 15 Nov 2026. Do not invent a URL."
+        }
+      ]
+    }
+  ]
+}

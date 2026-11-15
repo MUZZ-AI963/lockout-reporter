@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lockout Reporter</title>
+<style>
+  :root {
+    --bg: #12110e;
+    --card: #1e1c18;
+    --card-2: #26241f;
+    --line: #3c3830;
+    --text: #f4f1ea;
+    --muted: #a39e93;
+    --faint: #7c776e;
+    --orange: #e3943a;
+    --warn: #3a2412;
+    --warn-line: #c47d32;
+    --cream: #f6f3ec;
+    --cream-text: #1c1914;
+    --input: #14130f;
+    --ok: #c8d4b8;
+    --bad: #e7b4a4;
+    --shadow: 0 0 0 1px #3c3830;
+  }
+  html[data-theme="light"] {
+    --bg: #f3efe6;
+    --card: #fffdf8;
+    --card-2: #f7f3ea;
+    --line: #ddd4c4;
+    --text: #1c1914;
+    --muted: #5e584e;
+    --faint: #7a7368;
+    --orange: #b86a12;
+    --warn: #fff4e6;
+    --warn-line: #c47d32;
+    --cream: #1c1914;
+    --cream-text: #f6f3ec;
+    --input: #fff;
+    --ok: #1d3b24;
+    --bad: #7a2e22;
+    --shadow: 0 0 0 1px #ddd4c4;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body {
+    font: 15px/1.45 "Segoe UI", Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 22px 22px 48px; }
+  header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+  h1 { font-family: Palatino, "Iowan Old Style", Georgia, serif; font-weight: 500; font-size: 42px; margin: 0; letter-spacing: -0.03em; }
+  .kicker { margin: 8px 0 0; color: var(--muted); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .tools { display: flex; gap: 8px; }
+  .pill {
+    background: transparent; border: 1px solid var(--line); color: var(--text);
+    border-radius: 999px; padding: 8px 14px;
+  }
+  .pill:hover, .card:hover { border-color: var(--orange); }
+  .banner {
+    margin-top: 18px; background: var(--cream); color: var(--cream-text);
+    text-align: center; padding: 10px 12px; font-size: 14px;
+  }
+  .warn {
+    margin-top: 12px; border: 1px solid var(--warn-line); background: var(--warn);
+    padding: 12px 14px; border-radius: 8px;
+  }
+  .warn strong { display: block; margin-bottom: 4px; }
+  .layout { display: grid; grid-template-columns: 180px 1fr; gap: 28px; margin-top: 22px; }
+  nav { display: flex; flex-direction: column; gap: 4px; }
+  nav button {
+    display: flex; gap: 10px; align-items: center; text-align: left;
+    background: transparent; border: 0; color: var(--muted); padding: 7px 4px; border-radius: 8px;
+  }
+  nav button[aria-current="step"] { color: var(--text); }
+  .n {
+    width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+    border: 1px solid var(--line); font-size: 12px; flex: 0 0 auto;
+  }
+  nav button[aria-current="step"] .n { background: var(--orange); color: #1a1208; border-color: var(--orange); }
+  h2 { font-family: Palatino, Georgia, serif; font-weight: 500; font-size: 28px; margin: 0 0 6px; }
+  .help { color: var(--muted); margin: 0 0 14px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .card {
+    text-align: left; background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 12px 14px; min-height: 108px;
+  }
+  .card[aria-pressed="true"] { border-color: var(--orange); box-shadow: inset 0 0 0 1px var(--orange); }
+  .card strong { display: block; margin-bottom: 6px; font-weight: 600; }
+  .card span { color: var(--muted); font-size: 13px; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  label { display: flex; flex-direction: column; gap: 6px; color: var(--muted); font-size: 13px; }
+  input, select, textarea {
+    background: var(--input); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; color: var(--text);
+  }
+  textarea { min-height: 88px; resize: vertical; }
+  .span2 { grid-column: 1 / -1; }
+  .foot { margin-top: 28px; color: var(--faint); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .free { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+  nav button.hot { color: var(--text); }
+  nav button.hot .n { border-color: var(--orange); color: var(--orange); }
+  .spiral-hero {
+    border: 1px solid var(--warn-line); background: var(--warn);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;
+  }
+  .spiral-count {
+    font-family: Palatino, Georgia, serif; font-size: 56px; line-height: 0.9; margin: 0;
+  }
+  .spiral-count span { display: block; font-family: "Segoe UI", Helvetica, sans-serif; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--orange); margin-bottom: 6px; }
+  .loop {
+    border-left: 4px solid var(--orange); background: var(--card);
+    padding: 10px 12px; margin-top: 8px; border-radius: 0 8px 8px 0;
+  }
+  .loop .who { color: var(--orange); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .loop.person { border-left-color: var(--ok); }
+  .strip {
+    margin-top: 12px; padding: 8px 12px; border-radius: 8px;
+    background: var(--warn); border: 1px solid var(--warn-line); font-weight: 600;
+  }
+  .limits {
+    margin-top: 12px; border: 1px solid var(--line); background: var(--card);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .limits summary {
+    cursor: pointer; font-weight: 600; list-style: none;
+  }
+  .limits summary::-webkit-details-marker { display: none; }
+  .limits ul { margin: 10px 0 0; padding-left: 1.1rem; color: var(--muted); }
+  .limits li { margin: 4px 0; }
+  .list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+  .row {
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  }
+  .row .tag { color: var(--orange); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .primary { background: var(--orange); color: #1a1208; border: 0; border-radius: 999px; padding: 8px 14px; font-weight: 600; }
+  a { color: var(--orange); }
+  .plain { list-style: none; padding: 0; margin: 8px 0 0; }
+  .plain li { margin: 6px 0; }
+  .letter {
+    white-space: pre-wrap; background: var(--card); border: 1px solid var(--line);
+    border-radius: 8px; padding: 12px; font-family: ui-monospace, monospace; font-size: 13px;
+  }
+  .note { color: var(--muted); font-size: 14px; }
+  .ok { color: var(--ok); }
+  .bad { color: var(--bad); }
+  code { font-family: ui-monospace, monospace; font-size: 12px; word-break: break-all; }
+  :focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  @media (max-width: 800px) {
+    .layout, .grid, .fields { grid-template-columns: 1fr; }
+    h1 { font-size: 32px; }
+    nav { flex-direction: row; overflow-x: auto; }
+  }
+  @media print {
+    nav, .tools, .banner, .warn, .no-print { display: none !important; }
+    body, .card, .letter, input, textarea { background: #fff; color: #000; }
+    .layout { display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Lockout Reporter</h1>
+      <p class="kicker">Locked out of an account · Write it down · Send it to the right place</p>
+      <p class="free">Free. No account. No payment. MUZZ AI PTY LTD, Australia. Built by Cursor.</p>
+    </div>
+    <div class="tools">
+      <button class="pill" id="theme" type="button">Theme</button>
+      <button class="pill" id="clear" type="button">Clear everything</button>
+    </div>
+  </header>
+  <div class="banner">Nothing you type leaves your browser.</div>
+  <div class="warn">
+    <strong>Watch for a second scam.</strong>
+    This page does not recover accounts. We never ask for your password, a fee, or remote access to your device to “get you back in.” Anyone who contacts you offering that, including people claiming to be from a government agency, should be treated as a scam. Government reporting services do not contact you to ask for money.
+  </div>
+  <details class="limits" open>
+    <summary>Limits · read before you use this</summary>
+    <ul>
+      <li>General information only. Not legal advice. Not a lawyer, not a regulator, not a court.</li>
+      <li>Not account recovery. We do not unlock accounts, take fees, or ask for passwords or remote access.</li>
+      <li>Nothing you type leaves your browser. MUZZ AI PTY LTD does not receive your case.</li>
+      <li>Free. No account. No payment. An agency may host and hand this page to a person with credit: MUZZ AI PTY LTD, Australia · Built by Cursor.</li>
+      <li>Regulator links and day-counts come from named official pages checked on 15 Nov 2026. Those pages can change. A 14-day line in a letter is the reply you ask for, not a statute.</li>
+      <li>A seal is tamper-evident on this device’s clock. It shows which key signed which bytes. It does not prove the story is true, and it does not decide whether a court or regulator admits the pack.</li>
+      <li>Company and bot sentences are stored as quotes. They are not findings.</li>
+    </ul>
+  </details>
+  <div class="layout">
+    <nav aria-label="Steps">
+      <button type="button" data-step="what"><span class="n">1</span>What happened</button>
+      <button type="button" class="hot" data-step="spiral"><span class="n">2</span>Bot death-spiral</button>
+      <button type="button" data-step="timeline"><span class="n">3</span>Timeline</button>
+      <button type="button" data-step="cost"><span class="n">4</span>What it cost</button>
+      <button type="button" data-step="where"><span class="n">5</span>Where to send it</button>
+      <button type="button" data-step="seal"><span class="n">6</span>Seal the record</button>
+      <button type="button" data-step="letters"><span class="n">7</span>Your letters</button>
+      <button type="button" data-step="track"><span class="n">8</span>Track it</button>
+    </nav>
+    <main id="main"></main>
+  </div>
+  <p class="foot">Free to use and free for an agency to hand to a person · MUZZ AI PTY LTD, Australia · Built by Cursor · Official pages checked 15 Nov 2026 · Saved in this browser only · General information, not legal advice</p>
+</div>
+<script>
+const STORE = "muzz-lockout-reporter-v1";
+const GENESIS = "0".repeat(64);
+const SITUATIONS = [
+  ["method", "A login method I never set up", "A new authenticator, phone, or passkey appeared, and now I can't get in."],
+  ["code", "The login code never arrives", "The code goes to email or a phone that is down or that I can't reach."],
+  ["else", "Someone else is in my account", "Password, email, or phone changed. Messages or purchases I didn't make."],
+  ["mail", "Mail rules or payment details changed", "Forwarding, a mailbox rule, or a payee's bank details changed without me."],
+  ["device", "A device or car is tied to the account", "The app is locked and the thing it controls has stopped working."],
+  ["offer", "Someone offered to get me back in", "For a fee, my password, or remote access to my device."],
+  ["other", "Something else", "Locked out, with no clear reason and no person to talk to."]
+];
+const PLACES = {
+  AU: {
+    name: "Australia",
+    path: [
+      ["The company", null, "Write to them first. Ask for the security record and a reply."],
+      ["A sector dispute scheme, where one applies", null, "Telecommunications, financial services, energy and water, some transport, and some tolls. OAIC says some of these come before a privacy complaint. The scheme pages are not linked here until each one is opened and dated."],
+      ["Office of the Australian Information Commissioner", "https://www.oaic.gov.au/privacy/privacy-complaints/lodge-a-privacy-complaint-with-us", "After the company. OAIC: no response in 30 days, or an unsatisfactory response. Written complaint. Access guidance says a reasonable period, and OAIC thinks 30 days is reasonable for an organisation."],
+      ["OAIC complaint form", "https://webform.oaic.gov.au/prod/?entitytype=Complaint&layoutcode=ComplaintWF", "The form itself."],
+      ["ReportCyber", "https://www.cyber.gov.au/submit-a-report", "1300 292 371. The app address failed a browser check on 15 Nov 2026, so this is the page and the phone."]
+    ],
+    also: [
+      ["Scamwatch", "https://portal.scamwatch.gov.au/report-a-scam/", "Not a police report."],
+      ["IDCARE", "https://www.idcare.org/", "Support, not a regulator. 1800 595 160."]
+    ],
+    unchecked: ["Each sector dispute scheme (telecommunications, financial services, energy and water, transport, tolls)", "State and territory privacy commissioners", "State crime-reporting offices", "Police"],
+    right: "APP 12",
+    clock: "OAIC thinks 30 days is a reasonable period for an organisation to give access. An agency has 30 days. That is guidance from the page checked on 15 Nov 2026, not a date this page calculates for you."
+  },
+  NZ: {
+    name: "New Zealand",
+    path: [
+      ["The agency", null, "The Privacy Commissioner says it will not accept a complaint that skipped this step."],
+      ["Office of the Privacy Commissioner", "https://www.privacy.org.nz/your-rights/making-a-complaint-to-the-privacy-commissioner/", "Use the Commissioner's own response-date calculator for an access request. This page does not invent a day count. The Commissioner's page says an investigation queue of at least six months."]
+    ],
+    also: [["Netsafe", "https://netsafe.org.nz/report/scams", "Scams, not a privacy complaint. 0508 638 723."]],
+    unchecked: ["NCSC", "Incident reporting", "Commerce Commission"],
+    right: "IPP 6",
+    clock: "Use the Privacy Commissioner's response-date calculator. This page does not invent that date."
+  },
+  UK: {
+    name: "United Kingdom",
+    path: [
+      ["The organisation", null, "Complain to them as a data-protection complaint. ICO: follow up on an access request after one month."],
+      ["Information Commissioner's Office", "https://ico.org.uk/make-a-complaint", "Within three months of the last meaningful contact. ICO says it cannot represent you and cannot award compensation."]
+    ],
+    also: [["Action Fraud", "https://www.actionfraud.police.uk/how-to-report-fraud", "Fraud and cyber crime. 0300 123 2040. A report here is not automatically an ICO report."]],
+    unchecked: [],
+    right: "UK GDPR Art 15",
+    clock: "ICO: follow up if it has been over one month. Then the ICO within three months of the last meaningful contact."
+  },
+  EU: {
+    name: "European Union",
+    path: [
+      ["The organisation", null, "Ask them first."],
+      ["Your national data protection authority", "https://www.edpb.europa.eu/about-edpb/our-members_en", "Not the EDPB itself. Pick the country where you live, work, or where it happened."],
+      ["How to file", "https://www.edpb.europa.eu/contact/file-a-complaint_en", "The EDPB sends you on to that authority."]
+    ],
+    also: [],
+    unchecked: [],
+    right: "GDPR Art 15",
+    clock: "The national authority's page sets the reply period. This page does not invent one."
+  },
+  US: {
+    name: "United States",
+    path: [
+      ["The company", null, "The letter asks them. This page does not invent a federal access clock. State law differs."],
+      ["FTC ReportFraud", "https://reportfraud.ftc.gov/", "ReportFraud says it cannot resolve your individual report."]
+    ],
+    also: [
+      ["IdentityTheft.gov", "https://www.identitytheft.gov/", "Identity theft. The page warns that a knowingly false report is a crime."],
+      ["IC3", "https://www.ic3.gov/", "Cyber-enabled crime. IC3 warns that impersonators ask for money. Immediate danger: local emergency services, not a form."]
+    ],
+    unchecked: [],
+    right: "the access right that applies where you live",
+    clock: "No federal access clock is recorded here. Do not treat 14 days as the statute."
+  },
+  CA: {
+    name: "Canada",
+    path: [
+      ["The organisation", null, "Raise it with them first."],
+      ["Office of the Privacy Commissioner of Canada", "https://www.priv.gc.ca/en/report-a-concern/", "OPC says formal complaints are delayed by several months. The access-page day count was not opened in the 15 Nov check, so it is not stated here."]
+    ],
+    also: [["Canadian Anti-Fraud Centre", null, "Named only. Its page was not confirmed on 15 Nov 2026, so there is no link."]],
+    unchecked: [],
+    right: "PIPEDA",
+    clock: "The access day count is not stated here. It was not copied off the official page in the 15 Nov check."
+  }
+};
+
+const blank = () => ({
+  step: "what",
+  situation: "method",
+  company: "",
+  product: "",
+  account: "",
+  lockoutDate: "",
+  country: "AU",
+  yourName: "",
+  spiral: [],
+  timeline: [],
+  costTime: "",
+  costMoney: "",
+  costStopped: "",
+  sentOn: "",
+  contacts: [],
+  log: [],
+  key: null
+});
+
+let state = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE);
+    if (!raw) return blank();
+    return Object.assign(blank(), JSON.parse(raw));
+  } catch (err) {
+    return blank();
+  }
+}
+function save() {
+  const copy = Object.assign({}, state);
+  localStorage.setItem(STORE, JSON.stringify(copy));
+}
+function jsString(s) {
+  let out = '"';
+  for (const ch of s) {
+    const c = ch.codePointAt(0);
+    if (ch === '"') out += '\\"';
+    else if (ch === "\\") out += "\\\\";
+    else if (ch === "\n") out += "\\n";
+    else if (ch === "\r") out += "\\r";
+    else if (ch === "\t") out += "\\t";
+    else if (c < 32 || c > 126) out += "\\u" + c.toString(16).padStart(4, "0");
+    else out += ch;
+  }
+  return out + '"';
+}
+function canonical(v) {
+  if (v === null) return "null";
+  if (typeof v === "boolean") return v ? "true" : "false";
+  if (typeof v === "number") return Number.isFinite(v) ? String(v) : "null";
+  if (typeof v === "string") return jsString(v);
+  if (Array.isArray(v)) return "[" + v.map(canonical).join(",") + "]";
+  const keys = Object.keys(v).filter((k) => v[k] !== undefined).sort();
+  return "{" + keys.map((k) => jsString(k) + ":" + canonical(v[k])).join(",") + "}";
+}
+async function sha256hex(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+function hex(buf) {
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+function fromHex(h) {
+  const out = new Uint8Array(h.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(h.slice(i * 2, i * 2 + 2), 16);
+  return out;
+}
+function snapshot() {
+  return {
+    account: state.account,
+    company: state.company,
+    contacts: state.contacts,
+    costMoney: state.costMoney,
+    costStopped: state.costStopped,
+    costTime: state.costTime,
+    country: state.country,
+    lockoutDate: state.lockoutDate,
+    product: state.product,
+    sentOn: state.sentOn,
+    situation: state.situation,
+    spiral: state.spiral,
+    timeline: state.timeline,
+    yourName: state.yourName
+  };
+}
+async function verifyLog(log) {
+  let prev = GENESIS;
+  for (let i = 0; i < log.length; i++) {
+    const entry = log[i];
+    const body = Object.assign({}, entry);
+    delete body.entry_hash;
+    if (body.prev_hash !== prev) return { ok: false, at: i, reason: "prev_hash" };
+    const hash = await sha256hex(prev + canonical(body));
+    if (hash !== entry.entry_hash) return { ok: false, at: i, reason: "entry_hash" };
+    if (entry.kind === "holder_seal" && entry.approval_sig && state.key) {
+      const material = canonical({
+        digest: entry.statement_digest,
+        name: entry.name,
+        reason: entry.reason,
+        role: "holder"
+      });
+      const publicKey = await crypto.subtle.importKey("raw", fromHex(state.key.pub), { name: "Ed25519" }, true, ["verify"]);
+      const ok = await crypto.subtle.verify(
+        { name: "Ed25519" },
+        publicKey,
+        fromHex(entry.approval_sig),
+        new TextEncoder().encode(material)
+      );
+      if (!ok) return { ok: false, at: i, reason: "signature" };
+    }
+    prev = entry.entry_hash;
+  }
+  return { ok: true, head: log.length ? log[log.length - 1].entry_hash : GENESIS };
+}
+function lastSeal() {
+  for (let i = state.log.length - 1; i >= 0; i--) {
+    if (state.log[i].kind === "holder_seal") return state.log[i];
+  }
+  return null;
+}
+async function changedSinceSeal() {
+  const seal = lastSeal();
+  if (!seal) return false;
+  const now = await sha256hex(canonical(snapshot()));
+  return now !== seal.snapshot_hash;
+}
+
+document.getElementById("theme").onclick = () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem(STORE + "-theme", next);
+};
+document.getElementById("clear").onclick = () => {
+  if (!confirm("Clear this record from this browser? The letters you already copied stay wherever you pasted them.")) return;
+  localStorage.removeItem(STORE);
+  state = blank();
+  render();
+};
+const savedTheme = localStorage.getItem(STORE + "-theme");
+if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+
+document.querySelectorAll("nav button").forEach((btn) => {
+  btn.onclick = () => { state.step = btn.dataset.step; save(); render(); };
+});
+
+function field(label, id, value, type) {
+  const input = type === "area"
+    ? `<textarea id="${id}">${escapeText(value)}</textarea>`
+    : `<input id="${id}" ${type === "date" ? 'type="date"' : ""} value="${escapeAttr(value)}">`;
+  return `<label class="${type === "area" ? "span2" : ""}">${label}${input}</label>`;
+}
+function escapeText(s) {
+  return String(s || "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+}
+function escapeAttr(s) {
+  return escapeText(s).replace(/"/g, "&quot;");
+}
+function read() {
+  const take = (id) => {
+    const el = document.getElementById(id);
+    return el ? el.value : null;
+  };
+  ["company", "product", "account", "lockoutDate", "yourName", "country", "costTime", "costMoney", "costStopped", "sentOn"].forEach((id) => {
+    const v = take(id);
+    if (v !== null) state[id] = v.trim();
+  });
+}
+
+async function render() {
+  document.querySelectorAll("nav button").forEach((btn) => {
+    if (btn.dataset.step === state.step) btn.setAttribute("aria-current", "step");
+    else btn.removeAttribute("aria-current");
+  });
+  const main = document.getElementById("main");
+  const step = state.step;
+  if (step === "what") main.innerHTML = viewWhat();
+  else if (step === "spiral") main.innerHTML = viewSpiral();
+  else if (step === "timeline") main.innerHTML = viewTimeline();
+  else if (step === "cost") main.innerHTML = viewCost();
+  else if (step === "where") main.innerHTML = viewWhere();
+  else if (step === "seal") main.innerHTML = await viewSeal();
+  else if (step === "letters") main.innerHTML = viewLetters();
+  else main.innerHTML = viewTrack();
+  bind();
+  save();
+}
+
+function viewWhat() {
+  const cards = SITUATIONS.map(([id, title, blurb]) =>
+    `<button type="button" class="card" data-sit="${id}" aria-pressed="${state.situation === id}">
+      <strong>${escapeText(title)}</strong><span>${escapeText(blurb)}</span></button>`
+  ).join("");
+  return `<h2>What happened?</h2>
+    <p class="help">Pick the one closest to what you saw. It decides which places you get pointed to. You can change it later.</p>
+    <div class="grid">${cards}</div>
+    <div class="fields">
+      ${field("Company that holds the account", "company", state.company)}
+      ${field("Product or service", "product", state.product)}
+      ${field("Account identifier (the email or username on the account)", "account", state.account)}
+      ${field("Date you were first locked out", "lockoutDate", state.lockoutDate, "date")}
+    </div>`;
+}
+function spiralTally() {
+  const n = state.spiral.length;
+  const named = state.spiral.findIndex((loop) => loop.namedHuman);
+  if (!n) return { n: 0, line: "No loops yet. The help-desk has not been written down." };
+  if (named === -1) return { n, line: n + (n === 1 ? " loop. No named person. Still locked out." : " loops. No named person. Still locked out.") };
+  return { n, line: n + " loops. A named person appeared on loop " + (named + 1) + "." };
+}
+function viewSpiral() {
+  const tally = spiralTally();
+  const loops = state.spiral.map((loop, i) => {
+    const inset = Math.min(i * 18, 108);
+    return `<article class="loop ${loop.namedHuman ? "person" : ""}" style="margin-left:${inset}px">
+      <div class="who">Loop ${i + 1} · ${loop.namedHuman ? "a person was named" : "bot · still no person"} · ${escapeText(loop.at || "no date")}</div>
+      <p><strong>Bot.</strong> ${escapeText(loop.botSaid)}</p>
+      <p><strong>You wrote back.</strong> ${escapeText(loop.youSaid || "—")}</p>
+      <button type="button" class="pill" data-dels="${i}">Remove this loop</button>
+    </article>`;
+  }).join("");
+  return `<div class="spiral-hero">
+      <p class="spiral-count"><span>Bot death-spiral</span>${tally.n}</p>
+      <p>${escapeText(tally.line)} Each reply that is not a named person is another turn. The loss keeps running while the bot repeats.</p>
+    </div>
+    <h2>Write the loop</h2>
+    <p class="help">One turn is: the bot answers, you answer, you are still locked out. Their sentence is a quote. It is not a finding, and it is not a person.</p>
+    ${loops || `<p class="note">Start with the first bot reply. Case numbers, “a specialist will reply”, and a closed ticket with no name all count as a loop.</p>`}
+    <div class="fields">
+      ${field("Date of this reply", "spDate", "", "date")}
+      ${field("What the bot said", "spBot", "", "area")}
+      ${field("What you wrote back", "spYou", "", "area")}
+      <label class="span2"><span>A named person replied, not a bot</span>
+        <select id="spHuman"><option value="no" selected>No. Still a bot.</option><option value="yes">Yes. A person was named.</option></select>
+      </label>
+    </div>
+    <div class="actions no-print"><button class="primary" id="addLoop" type="button">Add this loop</button></div>`;
+}
+function viewTimeline() {
+  const rows = state.timeline.map((row, i) =>
+    `<div class="row"><div class="tag">${row.kind === "quote" ? "Company or bot · not your finding" : "What you saw"}</div>
+     <div>${escapeText(row.at || "No date")} · ${escapeText(row.text)}</div>
+     <button type="button" class="pill" data-del="${i}">Remove</button></div>`
+  ).join("") || `<p class="note">Nothing written yet. Dates you type here are this device's clock or the date you enter. They are not a time-stamping service.</p>`;
+  return `<h2>Timeline</h2>
+    <p class="help">Write what you saw, in order. Put the company's sentences in as quotes. A quote stays a quote.</p>
+    <div class="list">${rows}</div>
+    <div class="fields">
+      ${field("Date", "evDate", "", "date")}
+      ${field("What you saw", "evText", "", "area")}
+    </div>
+    <div class="actions no-print">
+      <button class="primary" id="addSaw" type="button">Add what I saw</button>
+      <button class="pill" id="addQuote" type="button">Add their sentence as a quote</button>
+    </div>`;
+}
+function viewCost() {
+  return `<h2>What it cost</h2>
+    <p class="help">The letter leads with this. Time, money, and what stopped.</p>
+    <div class="fields">
+      ${field("Time you have been locked out", "costTime", state.costTime)}
+      ${field("Money, if any", "costMoney", state.costMoney)}
+      ${field("What stopped — work, care, travel, a device", "costStopped", state.costStopped, "area")}
+    </div>`;
+}
+function viewWhere() {
+  const place = PLACES[state.country] || PLACES.AU;
+  const opts = Object.entries(PLACES).map(([id, p]) =>
+    `<option value="${id}" ${id === state.country ? "selected" : ""}>${escapeText(p.name)}</option>`
+  ).join("");
+  const items = place.path.map(([name, url, note]) =>
+    `<li><strong>${url ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${escapeText(name)}</a>` : escapeText(name)}</strong> — ${escapeText(note)}</li>`
+  ).join("");
+  const also = place.also.map(([name, url, note]) =>
+    `<li>${url ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${escapeText(name)}</a>` : escapeText(name)} — ${escapeText(note)}</li>`
+  ).join("");
+  const unchecked = place.unchecked.length
+    ? `<h3>Named, not checked</h3><p class="note">No link, until each official page is opened and dated.</p><ul class="plain">${place.unchecked.map((n) => `<li>${escapeText(n)}</li>`).join("")}</ul>`
+    : "";
+  return `<h2>Where to send it</h2>
+    <p class="help">The company first. Then the regulator for the country you pick. A 14-day line in your letter is the date you ask for. It is not the statute.</p>
+    <div class="fields"><label>Country<select id="country">${opts}</select></label></div>
+    <ol class="plain">${items}</ol>
+    ${also ? `<h3>Also</h3><ul class="plain">${also}</ul>` : ""}
+    ${unchecked}
+    <p class="note">${escapeText(place.clock)}</p>`;
+}
+async function viewSeal() {
+  let status = "Nothing sealed yet.";
+  let cls = "note";
+  if (state.log.length) {
+    const check = await verifyLog(state.log);
+    const dirty = await changedSinceSeal();
+    if (!check.ok) { status = "The record no longer matches its seal (" + check.reason + ")."; cls = "bad"; }
+    else if (dirty) { status = "You changed the page after the seal. The old seal still covers the old bytes. Seal again to cover what is on the page now."; cls = "bad"; }
+    else status = "Seal holds. Head " + check.head.slice(0, 16) + "…";
+    if (check.ok && !dirty) cls = "ok";
+  }
+  const head = state.log.length ? state.log[state.log.length - 1].entry_hash : "";
+  return `<h2>Seal the record</h2>
+    <p class="help">This is the browser copy of the log. The head below is the anchor, kept in this browser with the time on this device. A seal shows these bytes were not edited after signing. It does not prove the dates came from anywhere but this device, and it does not prove the account of events is true.</p>
+    <div class="fields">${field("Your name, as you want it on the seal", "yourName", state.yourName)}</div>
+    <p class="${cls}">${escapeText(status)}</p>
+    ${head ? `<p><code>${escapeText(head)}</code></p>` : ""}
+    <div class="actions no-print">
+      <button class="primary" id="doSeal" type="button">Seal this record</button>
+      <button class="pill" id="copyPack" type="button">Copy the pack</button>
+    </div>
+    <p class="note">Signing uses a key that stays in this browser. Open the page from this computer (a local address). There is no time-stamping service and no server. A stronger date would be something like RFC 3161, and that needs a server, which this page does not have.</p>`;
+}
+function letterBlock(title, text, id) {
+  return `<h3>${title}</h3><div class="letter" id="${id}">${escapeText(text)}</div>
+    <div class="actions no-print"><button type="button" class="pill" data-copy="${id}">Copy</button></div>`;
+}
+function viewLetters() {
+  const place = PLACES[state.country] || PLACES.AU;
+  const sit = SITUATIONS.find((s) => s[0] === state.situation);
+  const who = state.yourName || "[your name]";
+  const when = state.lockoutDate || "[date]";
+  const company = state.company || "[company]";
+  const tally = spiralTally();
+  const spiralText = state.spiral.map((loop, i) =>
+    `Loop ${i + 1} (${loop.at || "undated"}) — ${loop.namedHuman ? "A person was named." : "Bot. No named person."}\nBot: ${loop.botSaid}\nI wrote: ${loop.youSaid || "—"}`
+  ).join("\n\n");
+  const lines = state.timeline.map((row) => `${row.at || "undated"} — ${row.kind === "quote" ? "Their words: " : ""}${row.text}`).join("\n");
+  const cost = [state.costTime, state.costMoney, state.costStopped].filter(Boolean).join("\n");
+  const ask = `Please reply within 14 days of receiving this letter. That 14 days is the reply I am asking for. It is not stated here as a statutory period.`;
+  const foot = `\n\nGeneral information, not legal advice. I have not asked anyone to recover this account for a fee, a password, or remote access.`;
+  const access = `${who}\n${new Date().toISOString().slice(0, 10)} (date from this device)\n\n${company}\n\nRequest for my security records (${place.right})\n\nI have been locked out of ${state.product || "the service"} since ${when}. The account identifier I use is ${state.account || "[account]"}.\n\nWhat I saw: ${sit ? sit[1] : ""}.\n\nBot death-spiral: ${tally.line}\n${spiralText || "(no bot loops written down)"}\n\n${lines ? "Other notes:\n" + lines + "\n" : ""}\n\nWhat it cost:\n${cost || "(not filled in)"}\n\nPlease give me the records of sign-in changes, login methods added or removed, recovery addresses, mailbox rules or forwarding, and the support notes on this lockout, including who approved any change.\n\n${place.clock}\n\n${ask}${foot}`;
+  const complaint = `${who}\n${new Date().toISOString().slice(0, 10)} (date from this device)\n\n${company}\n\nComplaint\n\nI am locked out. ${sit ? sit[1] + ". " + sit[2] : ""}\n\nBot death-spiral: ${tally.line}\n${spiralText || "(no bot loops written down)"}\n\n${lines ? "Other notes:\n" + lines + "\n" : ""}\nWhat it cost:\n${cost || "(not filled in)"}\n\nI want a named person and a record of every security change. Another bot reply is another loop, not a resolution.\n\n${ask}${foot}`;
+  const regulator = `${who}\n\nSummary for ${place.name}\n\nCompany: ${company}\nProduct: ${state.product || "[product]"}\nLocked out since: ${when}\n\n${sit ? sit[1] : ""}\n\nBot death-spiral: ${tally.line}\n${spiralText || "(no bot loops written down)"}\n\nI complained to the company first: ${state.sentOn || "[date I send it, not yet entered]"}.\n\n${place.clock}\n\nThis summary is for me to paste. It is general information, not legal advice, and it is not a finding that the company broke a law.`;
+  return `<h2>Your letters</h2>
+    <p class="help">Copy what you want to send. Nothing is sent from this page.</p>
+    ${letterBlock("Security-records request", access, "letAccess")}
+    ${letterBlock("Complaint to the company", complaint, "letCompany")}
+    ${letterBlock("Regulator summary", regulator, "letReg")}`;
+}
+function viewTrack() {
+  const place = PLACES[state.country] || PLACES.AU;
+  let asked = "";
+  if (state.sentOn) {
+    const d = new Date(state.sentOn + "T00:00:00");
+    d.setDate(d.getDate() + 14);
+    asked = d.toISOString().slice(0, 10);
+  }
+  const rows = state.contacts.map((c, i) =>
+    `<div class="row">${escapeText(c.at)} · ${escapeText(c.who)} · ${escapeText(c.note)}
+     <button type="button" class="pill" data-delc="${i}">Remove</button></div>`
+  ).join("");
+  return `<h2>Track it</h2>
+    <p class="help">Kept in this browser. The 14-day date is the reply you asked for. The statute is the sentence under it, and this page does not turn that sentence into a calendar date.</p>
+    <div class="fields">${field("Date you send the company letter", "sentOn", state.sentOn, "date")}</div>
+    <p>${asked ? "You asked for a reply by <strong>" + escapeText(asked) + "</strong>." : "Enter a send date to count 14 days from it."}</p>
+    <p class="note">${escapeText(place.clock)}</p>
+    <h3>Contact log</h3>
+    <div class="list">${rows || "<p class='note'>No contacts yet.</p>"}</div>
+    <div class="fields">
+      ${field("Date", "cDate", "", "date")}
+      ${field("Who", "cWho", "")}
+      ${field("What they said, or that nobody did", "cNote", "", "area")}
+    </div>
+    <div class="actions no-print"><button class="primary" id="addContact" type="button">Add to the log</button></div>`;
+}
+
+function bind() {
+  document.querySelectorAll("[data-sit]").forEach((btn) => {
+    btn.onclick = () => { state.situation = btn.dataset.sit; save(); render(); };
+  });
+  document.querySelectorAll("input, textarea, select").forEach((el) => {
+    el.onchange = () => { read(); save(); if (state.step === "where" || state.step === "track") render(); };
+  });
+  const addLoop = document.getElementById("addLoop");
+  if (addLoop) addLoop.onclick = () => {
+    const botSaid = document.getElementById("spBot").value.trim();
+    if (botSaid.length < 8) return;
+    state.spiral.push({
+      at: document.getElementById("spDate").value,
+      botSaid,
+      youSaid: document.getElementById("spYou").value.trim(),
+      namedHuman: document.getElementById("spHuman").value === "yes"
+    });
+    save();
+    render();
+  };
+  document.querySelectorAll("[data-dels]").forEach((btn) => {
+    btn.onclick = () => { state.spiral.splice(Number(btn.dataset.dels), 1); save(); render(); };
+  });
+  const addSaw = document.getElementById("addSaw");
+  const addQuote = document.getElementById("addQuote");
+  if (addSaw) addSaw.onclick = () => addEvent("saw");
+  if (addQuote) addQuote.onclick = () => addEvent("quote");
+  document.querySelectorAll("[data-del]").forEach((btn) => {
+    btn.onclick = () => { state.timeline.splice(Number(btn.dataset.del), 1); save(); render(); };
+  });
+  const seal = document.getElementById("doSeal");
+  if (seal) seal.onclick = doSeal;
+  const pack = document.getElementById("copyPack");
+  if (pack) pack.onclick = copyPack;
+  document.querySelectorAll("[data-copy]").forEach((btn) => {
+    btn.onclick = async () => {
+      const text = document.getElementById(btn.dataset.copy).innerText;
+      await navigator.clipboard.writeText(text);
+      btn.textContent = "Copied";
+    };
+  });
+  const addC = document.getElementById("addContact");
+  if (addC) addC.onclick = () => {
+    read();
+    const note = document.getElementById("cNote").value.trim();
+    if (note.length < 3) return;
+    state.contacts.push({
+      at: document.getElementById("cDate").value,
+      who: document.getElementById("cWho").value.trim() || "company",
+      note
+    });
+    save();
+    render();
+  };
+  document.querySelectorAll("[data-delc]").forEach((btn) => {
+    btn.onclick = () => { state.contacts.splice(Number(btn.dataset.delc), 1); save(); render(); };
+  });
+}
+function addEvent(kind) {
+  const text = document.getElementById("evText").value.trim();
+  if (text.length < 8) return;
+  state.timeline.push({ kind, at: document.getElementById("evDate").value, text });
+  save();
+  render();
+}
+async function ensureKey() {
+  if (state.key && state.key.pkcs8 && state.key.pub) return state.key;
+  const pair = await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
+  const pkcs8 = await crypto.subtle.exportKey("pkcs8", pair.privateKey);
+  const raw = await crypto.subtle.exportKey("raw", pair.publicKey);
+  state.key = { pkcs8: hex(pkcs8), pub: hex(raw) };
+  save();
+  return state.key;
+}
+async function doSeal() {
+  read();
+  if (!state.yourName || state.yourName.length < 2) {
+    alert("Put your name on the seal.");
+    return;
+  }
+  if (!window.isSecureContext || !crypto.subtle) {
+    alert("This browser will hash the record, but it will not sign, unless you open the page from a local address such as http://127.0.0.1.");
+    return;
+  }
+  const key = await ensureKey();
+  const privateKey = await crypto.subtle.importKey(
+    "pkcs8",
+    fromHex(key.pkcs8),
+    { name: "Ed25519" },
+    true,
+    ["sign"]
+  );
+  const at = new Date().toISOString();
+  const snap = snapshot();
+  const snapHash = await sha256hex(canonical(snap));
+  const prev = state.log.length ? state.log[state.log.length - 1].entry_hash : GENESIS;
+  const reason = "This is my account of the lockout.";
+  const digest = await sha256hex(canonical({
+    name: state.yourName,
+    prev_hash: prev,
+    reason,
+    role: "holder",
+    snapshot_hash: snapHash
+  }));
+  const material = canonical({ digest, name: state.yourName, reason, role: "holder" });
+  const sig = await crypto.subtle.sign({ name: "Ed25519" }, privateKey, new TextEncoder().encode(material));
+  const body = {
+    approval_sig: hex(sig),
+    approver_pub: key.pub,
+    at,
+    clock_source: "device",
+    kind: "holder_seal",
+    name: state.yourName,
+    prev_hash: prev,
+    reason,
+    role: "holder",
+    seq: state.log.length + 1,
+    snapshot: snap,
+    snapshot_hash: snapHash,
+    statement_digest: digest
+  };
+  body.entry_hash = await sha256hex(prev + canonical(body));
+  state.log.push(body);
+  save();
+  render();
+}
+async function copyPack() {
+  const check = await verifyLog(state.log);
+  const pack = {
+    product: "MUZZ lockout reporter",
+    clock_source: "device",
+    limits: [
+      "The time on each seal is this device's clock. It is not a time-stamping authority.",
+      "A seal shows which key signed which bytes. It does not prove the account of events is true.",
+      "A company quote is not a finding.",
+      "General information, not legal advice."
+    ],
+    verify: check,
+    log: state.log.map((e) => {
+      const copy = Object.assign({}, e);
+      return copy;
+    })
+  };
+  await navigator.clipboard.writeText(JSON.stringify(pack, null, 2));
+}
+
+render();
+</script>
+</body>
+</html>
