@@ -255,6 +255,25 @@
 <script>
 const STORE = "muzz-lockout-reporter-v1";
 const GENESIS = "0".repeat(64);
+const STEPS = ["what", "spiral", "timeline", "cost", "where", "seal", "letters", "track"];
+function stepNav() {
+  const i = STEPS.indexOf(state.step);
+  const prev = i > 0;
+  const next = i >= 0 && i < STEPS.length - 1;
+  return `<div class="actions no-print step-nav" style="margin-top:22px;justify-content:space-between;align-items:center">
+    ${prev ? `<button type="button" class="pill" id="goPrev">← Back</button>` : `<span></span>`}
+    ${next ? `<button type="button" class="primary" id="goNext">Next →</button>` : `<span class="note">Done — use the steps on the left anytime</span>`}
+  </div>`;
+}
+function goStep(delta) {
+  read();
+  const i = STEPS.indexOf(state.step);
+  const j = i + delta;
+  if (j < 0 || j >= STEPS.length) return;
+  state.step = STEPS[j];
+  save();
+  render();
+}
 const SITUATIONS = [
   ["method", "A login method I never set up", "A new authenticator, phone, or passkey appeared, and now I can't get in."],
   ["code", "The login code never arrives", "The code goes to email or a phone that is down or that I can't reach."],
@@ -696,7 +715,8 @@ function viewWhat() {
       ${field("Product or service", "product", state.product)}
       ${field("Account identifier (the email or username on the account)", "account", state.account)}
       ${field("Date you were first locked out", "lockoutDate", state.lockoutDate, "date")}
-    </div>`;
+    </div>
+    ${stepNav()}`;
 }
 function spiralTally() {
   const n = state.spiral.length;
@@ -731,7 +751,8 @@ function viewSpiral() {
         <select id="spHuman"><option value="no" selected>No. Still a bot.</option><option value="yes">Yes. A person was named.</option></select>
       </label>
     </div>
-    <div class="actions no-print"><button class="primary" id="addLoop" type="button">Add this loop</button></div>`;
+    <div class="actions no-print"><button class="primary" id="addLoop" type="button">Add this loop</button></div>
+    ${stepNav()}`;
 }
 function viewTimeline() {
   const rows = state.timeline.map((row, i) =>
@@ -749,7 +770,8 @@ function viewTimeline() {
     <div class="actions no-print">
       <button class="primary" id="addSaw" type="button">Add what I saw</button>
       <button class="pill" id="addQuote" type="button">Add their sentence as a quote</button>
-    </div>`;
+    </div>
+    ${stepNav()}`;
 }
 function viewCost() {
   return `<h2>What it cost</h2>
@@ -758,7 +780,8 @@ function viewCost() {
       ${field("Time you have been locked out", "costTime", state.costTime)}
       ${field("Money, if any", "costMoney", state.costMoney)}
       ${field("What stopped — work, care, travel, a device", "costStopped", state.costStopped, "area")}
-    </div>`;
+    </div>
+    ${stepNav()}`;
 }
 function buildTexts() {
   const place = PLACES[state.country] || PLACES.AU;
@@ -839,7 +862,8 @@ function viewWhere() {
     <p class="note">One story for every form. Copy once; reuse.</p>
     ${pasteBox("pack-draft", texts.draft)}
     ${cards}
-    <p class="note">${escapeText(place.clock)}</p>`;
+    <p class="note">${escapeText(place.clock)}</p>
+    ${stepNav()}`;
 }
 async function viewSeal() {
   let status = "Nothing sealed yet.";
@@ -862,7 +886,8 @@ async function viewSeal() {
       <button class="primary" id="doSeal" type="button">Seal this record</button>
       <button class="pill" id="copyPack" type="button">Copy the pack</button>
     </div>
-    <p class="note">Signing uses a key that stays in this browser. Open the page from this computer (a local address). There is no time-stamping service and no server. A stronger date would be something like RFC 3161, and that needs a server, which this page does not have.</p>`;
+    <p class="note">Signing uses a key that stays in this browser. Open the page from this computer (a local address). There is no time-stamping service and no server. A stronger date would be something like RFC 3161, and that needs a server, which this page does not have.</p>
+    ${stepNav()}`;
 }
 function viewLetters() {
   const texts = buildTexts();
@@ -874,7 +899,8 @@ function viewLetters() {
     <h3>Regulator summary</h3>${pasteBox("all-reg", texts.regulator)}
     <h3>Incident / cyber pack</h3>${pasteBox("all-cyber", texts.reportcyber)}
     <h3>Scam / fake-recovery pack</h3>${pasteBox("all-scam", texts.scamwatch)}
-    <h3>IDCARE pack</h3>${pasteBox("all-idcare", texts.idcare)}`;
+    <h3>IDCARE pack</h3>${pasteBox("all-idcare", texts.idcare)}
+    ${stepNav()}`;
 }
 function viewTrack() {
   const place = PLACES[state.country] || PLACES.AU;
@@ -900,10 +926,15 @@ function viewTrack() {
       ${field("Who", "cWho", "")}
       ${field("What they said, or that nobody did", "cNote", "", "area")}
     </div>
-    <div class="actions no-print"><button class="primary" id="addContact" type="button">Add to the log</button></div>`;
+    <div class="actions no-print"><button class="primary" id="addContact" type="button">Add to the log</button></div>
+    ${stepNav()}`;
 }
 
 function bind() {
+  const goNext = document.getElementById("goNext");
+  const goPrev = document.getElementById("goPrev");
+  if (goNext) goNext.onclick = () => goStep(1);
+  if (goPrev) goPrev.onclick = () => goStep(-1);
   document.querySelectorAll("[data-sit]").forEach((btn) => {
     btn.onclick = () => { state.situation = btn.dataset.sit; save(); render(); };
   });
