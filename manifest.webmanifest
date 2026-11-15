@@ -1,0 +1,19 @@
+{
+  "name": "Lockout Reporter",
+  "short_name": "Lockout",
+  "description": "Write the bot death-spiral. Ask for the company’s records. Copy letters for the right doors. Free. Nothing leaves your browser.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#12110e",
+  "theme_color": "#e3943a",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

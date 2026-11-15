@@ -19,11 +19,12 @@ Then tell Cursor: **“create public lockout-reporter Pages repo and push.”** 
 1. Create `MUZZ-AI963/lockout-reporter` (public).
 2. Push only the kit files (`index.html`, `agency.html`, `jurisdictions.json`, `LICENSE`, `AGENCY-NOTE.md`).
 3. Turn on GitHub Pages from `main` / root.
-4. Live URL: **https://muzz-ai963.github.io/lockout-reporter/**  
+4. Live URL: **https://muzz-ai963.github.io/lockout-reporter/** (website)  
+   Desk: **https://muzz-ai963.github.io/lockout-reporter/app.html**  
    Repo: https://github.com/MUZZ-AI963/lockout-reporter  
    Agency note: https://muzz-ai963.github.io/lockout-reporter/agency.html
 
-**Done 15 Nov 2026.** Every fix here is: edit → you say push → URL updates.
+**Done 15 Nov 2026 · website face + PWA 16 Nov 2026.** Every fix here is: edit → you say push → URL updates.
 
 Optional mirror: Cloudflare Pages → Connect to Git → this same repo.
 
