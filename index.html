@@ -131,16 +131,25 @@
     margin-top: 12px; padding: 8px 12px; border-radius: 8px;
     background: var(--warn); border: 1px solid var(--warn-line); font-weight: 600;
   }
-  .limits {
+  .howto {
     margin-top: 12px; border: 1px solid var(--line); background: var(--card);
-    border-radius: 8px; padding: 10px 14px;
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .howto h2 { font-size: 22px; margin: 0 0 8px; }
+  .howto p { margin: 0 0 8px; color: var(--muted); }
+  .howto p:last-child { margin-bottom: 0; }
+  .howto ol { margin: 8px 0 10px; padding-left: 1.2rem; color: var(--text); }
+  .howto li { margin: 4px 0; }
+  .limits {
+    margin-top: 18px; border: 1px solid var(--line); background: var(--card);
+    border-radius: 8px; padding: 8px 12px; font-size: 13px;
   }
   .limits summary {
-    cursor: pointer; font-weight: 600; list-style: none;
+    cursor: pointer; font-weight: 600; list-style: none; color: var(--muted);
   }
   .limits summary::-webkit-details-marker { display: none; }
-  .limits ul { margin: 10px 0 0; padding-left: 1.1rem; color: var(--muted); }
-  .limits li { margin: 4px 0; }
+  .limits ul { margin: 8px 0 0; padding-left: 1.1rem; color: var(--muted); }
+  .limits li { margin: 3px 0; }
   .list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
   .row {
     background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
@@ -166,7 +175,7 @@
     nav { flex-direction: row; overflow-x: auto; }
   }
   @media print {
-    nav, .tools, .banner, .warn, .no-print { display: none !important; }
+    nav, .tools, .banner, .warn, .howto, .limits, .no-print { display: none !important; }
     body, .card, .letter, input, textarea { background: #fff; color: #000; }
     .layout { display: block; }
   }
@@ -190,18 +199,17 @@
     <strong>Watch for a second scam.</strong>
     This page does not recover accounts. We never ask for your password, a fee, or remote access to your device to “get you back in.” Anyone who contacts you offering that, including people claiming to be from a government agency, should be treated as a scam. Government reporting services do not contact you to ask for money.
   </div>
-  <details class="limits" open>
-    <summary>Limits · read before you use this</summary>
-    <ul>
-      <li>General information only. Not legal advice. Not a lawyer, not a regulator, not a court.</li>
-      <li>Not account recovery. We do not unlock accounts, take fees, or ask for passwords or remote access.</li>
-      <li>Nothing you type leaves your browser. MUZZ AI PTY LTD does not receive your case.</li>
-      <li>Free. No account. No payment. An agency may host and hand this page to a person with credit: MUZZ AI PTY LTD, Australia · Built by Cursor.</li>
-      <li>Regulator links and day-counts come from named official pages checked on 15 Nov 2026. Those pages can change. A 14-day line in a letter is the reply you ask for, not a statute.</li>
-      <li>A seal is tamper-evident on this device’s clock. It shows which key signed which bytes. It does not prove the story is true, and it does not decide whether a court or regulator admits the pack.</li>
-      <li>Company and bot sentences are stored as quotes. They are not findings.</li>
-    </ul>
-  </details>
+  <section class="howto" aria-labelledby="howto-title">
+    <h2 id="howto-title">How and why</h2>
+    <p><strong>Why:</strong> Company help-desks answer with bots. You stay locked out. The loss keeps running. This page turns that loop into a record you hold, then letters for the company and the right regulator.</p>
+    <p><strong>How:</strong></p>
+    <ol>
+      <li>Say what happened.</li>
+      <li>Count every bot reply with no named person (the death-spiral).</li>
+      <li>Write the cost, seal the record, copy the letters.</li>
+    </ol>
+    <p>Nothing you type leaves this browser. <a href="./onboarding.html">Full onboarding →</a></p>
+  </section>
   <div class="layout">
     <nav aria-label="Steps">
       <button type="button" data-step="what"><span class="n">1</span>What happened</button>
@@ -215,7 +223,16 @@
     </nav>
     <main id="main"></main>
   </div>
-  <p class="foot">Free to use and free for an agency to hand to a person · MUZZ AI PTY LTD, Australia · Built by Cursor · Official pages checked 15 Nov 2026 · Saved in this browser only · General information, not legal advice</p>
+  <details class="limits">
+    <summary>Limits</summary>
+    <ul>
+      <li>Not legal advice. Not account recovery.</li>
+      <li>Nothing typed here leaves your browser.</li>
+      <li>A seal is this device’s clock only — not a court finding.</li>
+      <li>Links checked 15 Nov 2026; a 14-day ask in a letter is not a statute.</li>
+    </ul>
+  </details>
+  <p class="foot">Free to use and free for an agency to hand to a person · MUZZ AI PTY LTD, Australia · Built by Cursor · Saved in this browser only · General information, not legal advice</p>
 </div>
 <script>
 const STORE = "muzz-lockout-reporter-v1";

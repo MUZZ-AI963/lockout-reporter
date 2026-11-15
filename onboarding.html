@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lockout Reporter · onboarding</title>
+<style>
+  :root {
+    --bg: #12110e; --card: #1e1c18; --line: #3c3830; --text: #f4f1ea;
+    --muted: #a39e93; --orange: #e3943a; --warn: #3a2412; --warn-line: #c47d32;
+  }
+  html[data-theme="light"] {
+    --bg: #f3efe6; --card: #fffdf8; --line: #ddd4c4; --text: #1c1914;
+    --muted: #5e584e; --orange: #b86a12; --warn: #fff4e6; --warn-line: #c47d32;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.5 "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 40rem; margin: 0 auto; padding: 28px 20px 56px; }
+  h1 { font-family: Palatino, Georgia, serif; font-weight: 500; font-size: 2rem; margin: 0 0 8px; }
+  h2 { font-family: Palatino, Georgia, serif; font-weight: 500; font-size: 1.25rem; margin: 1.6rem 0 0.4rem; }
+  p, li { color: var(--muted); }
+  strong { color: var(--text); }
+  a { color: var(--orange); }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; margin: 14px 0;
+  }
+  .warn {
+    border: 1px solid var(--warn-line); background: var(--warn);
+    border-radius: 8px; padding: 12px 14px; margin: 14px 0;
+  }
+  .pill {
+    display: inline-block; margin-top: 8px; padding: 8px 14px; border-radius: 999px;
+    background: var(--orange); color: #1a1208; text-decoration: none; font-weight: 600;
+  }
+  ol { padding-left: 1.2rem; }
+  ol li { margin: 6px 0; color: var(--text); }
+  .foot { margin-top: 2rem; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p><a href="./index.html">← Back to Lockout Reporter</a></p>
+  <h1>Onboarding</h1>
+  <p>Free tool from <strong>MUZZ AI PTY LTD, Australia</strong> · Built by Cursor. For anyone locked out of an account and stuck talking to bots.</p>
+
+  <div class="warn">
+    <strong>This is not account recovery.</strong>
+    Nobody here will ask for your password, a fee, or remote access. If someone does, treat it as a scam.
+  </div>
+
+  <h2>Why this exists</h2>
+  <div class="card">
+    <p>A company changes how you sign in, or the only login code never arrives. Support answers with a bot. You open another case. The bot closes it. Weeks pass. Work, care, travel, or a device stays stuck. The company keeps the log. You keep the loss.</p>
+    <p>This page is so you can write that down once, ask for the company’s own security records, and take a short summary to the regulator in your country — without pasting your story into another company’s cloud.</p>
+  </div>
+
+  <h2>What stays on your machine</h2>
+  <ul>
+    <li>Everything you type is saved in <strong>this browser only</strong>.</li>
+    <li>MUZZ does not receive your case.</li>
+    <li>There is no account and no payment.</li>
+  </ul>
+
+  <h2>Walk (about 15–20 minutes)</h2>
+  <ol>
+    <li><strong>What happened</strong> — pick the closest situation; name the company and product; date you were first locked out.</li>
+    <li><strong>Bot death-spiral</strong> — each bot reply with no named person is one loop. Paste what they said. That sentence is a quote, not a finding.</li>
+    <li><strong>Timeline</strong> — anything else you saw, in order.</li>
+    <li><strong>What it cost</strong> — time, money, what stopped.</li>
+    <li><strong>Where to send it</strong> — pick your country; company first, then the regulator links that were checked.</li>
+    <li><strong>Seal</strong> — optional. Signs the record on this device. Prove later that the bytes were not edited. It does not prove the story is true.</li>
+    <li><strong>Your letters</strong> — copy the records request, the company complaint, and the regulator summary. Nothing is sent from this page.</li>
+    <li><strong>Track it</strong> — note when you sent the letter and what came back.</li>
+  </ol>
+
+  <h2>If you are the first person through (Craig and others)</h2>
+  <div class="card">
+    <p>Use your real case. Count every bot loop. Seal when the story so far is written. Copy the letters yourself. Do not ask Cursor or Claude to send them. Murray is the contact for the tool; you own your report.</p>
+  </div>
+
+  <h2>For agencies</h2>
+  <p>You may link to this page or host the files with credit. See <a href="./agency.html">the agency note</a>.</p>
+
+  <p><a class="pill" href="./index.html">Start the reporter</a></p>
+  <p class="foot">General information, not legal advice. Links and day-counts checked 15 Nov 2026. A 14-day line in a letter is the reply you ask for, not a statute.</p>
+</div>
+<script>
+  const t = localStorage.getItem("muzz-lockout-reporter-v1-theme");
+  if (t) document.documentElement.dataset.theme = t;
+</script>
+</body>
+</html>
