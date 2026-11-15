@@ -150,6 +150,24 @@
   .limits summary::-webkit-details-marker { display: none; }
   .limits ul { margin: 8px 0 0; padding-left: 1.1rem; color: var(--muted); }
   .limits li { margin: 3px 0; }
+  .draft-banner {
+    display: inline-block; margin: 0 0 10px; padding: 4px 10px; border-radius: 999px;
+    background: var(--warn); border: 1px solid var(--warn-line); font-size: 12px; font-weight: 600;
+  }
+  .channel {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 14px; margin: 10px 0;
+  }
+  .channel h3 { margin: 0 0 4px; font-size: 17px; }
+  .channel .when { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+  .channel ol { margin: 8px 0; padding-left: 1.2rem; }
+  .channel li { margin: 6px 0; }
+  .channel .do { color: var(--text); }
+  .paste-mini {
+    margin-top: 8px; white-space: pre-wrap; background: var(--input); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px; font-family: ui-monospace, monospace; font-size: 12px;
+    max-height: 140px; overflow: auto;
+  }
   .list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
   .row {
     background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
@@ -206,7 +224,7 @@
     <ol>
       <li>Say what happened.</li>
       <li>Count every bot reply with no named person (the death-spiral).</li>
-      <li>Write the cost, seal the record, copy the letters.</li>
+      <li>Write the cost. Use <strong>Send pack</strong> — copy each block into the official form. Seal if you want. Track what came back.</li>
     </ol>
     <p>Nothing you type leaves this browser. <a href="./onboarding.html">Full onboarding →</a></p>
   </section>
@@ -216,9 +234,9 @@
       <button type="button" class="hot" data-step="spiral"><span class="n">2</span>Bot death-spiral</button>
       <button type="button" data-step="timeline"><span class="n">3</span>Timeline</button>
       <button type="button" data-step="cost"><span class="n">4</span>What it cost</button>
-      <button type="button" data-step="where"><span class="n">5</span>Where to send it</button>
+      <button type="button" data-step="where"><span class="n">5</span>Send pack</button>
       <button type="button" data-step="seal"><span class="n">6</span>Seal the record</button>
-      <button type="button" data-step="letters"><span class="n">7</span>Your letters</button>
+      <button type="button" data-step="letters"><span class="n">7</span>All drafts</button>
       <button type="button" data-step="track"><span class="n">8</span>Track it</button>
     </nav>
     <main id="main"></main>
@@ -249,79 +267,229 @@ const SITUATIONS = [
 const PLACES = {
   AU: {
     name: "Australia",
-    path: [
-      ["The company", null, "Write to them first. Ask for the security record and a reply."],
-      ["A sector dispute scheme, where one applies", null, "Telecommunications, financial services, energy and water, some transport, and some tolls. OAIC says some of these come before a privacy complaint. The scheme pages are not linked here until each one is opened and dated."],
-      ["Office of the Australian Information Commissioner", "https://www.oaic.gov.au/privacy/privacy-complaints/lodge-a-privacy-complaint-with-us", "After the company. OAIC: no response in 30 days, or an unsatisfactory response. Written complaint. Access guidance says a reasonable period, and OAIC thinks 30 days is reasonable for an organisation."],
-      ["OAIC complaint form", "https://webform.oaic.gov.au/prod/?entitytype=Complaint&layoutcode=ComplaintWF", "The form itself."],
-      ["ReportCyber", "https://www.cyber.gov.au/submit-a-report", "1300 292 371. The app address failed a browser check on 15 Nov 2026, so this is the page and the phone."]
-    ],
-    also: [
-      ["Scamwatch", "https://portal.scamwatch.gov.au/report-a-scam/", "Not a police report."],
-      ["IDCARE", "https://www.idcare.org/", "Support, not a regulator. 1800 595 160."]
-    ],
-    unchecked: ["Each sector dispute scheme (telecommunications, financial services, energy and water, transport, tolls)", "State and territory privacy commissioners", "State crime-reporting offices", "Police"],
     right: "APP 12",
-    clock: "OAIC thinks 30 days is a reasonable period for an organisation to give access. An agency has 30 days. That is guidance from the page checked on 15 Nov 2026, not a date this page calculates for you."
+    clock: "OAIC thinks 30 days is a reasonable period for an organisation to give access. An agency has 30 days. Checked 15 Nov 2026.",
+    channels: [
+      {
+        id: "company",
+        title: "1 · The company (do this first)",
+        when: "Always first. Email support or their privacy address if you have one.",
+        open: null,
+        paste: "company",
+        steps: [
+          "Copy the company pack below.",
+          "Open your mail. New message to the company’s support or privacy address (from their website — do not invent one).",
+          "Subject: Account lockout — security records request and complaint.",
+          "Paste the whole pack into the body. Send. Note the date on Track it."
+        ]
+      },
+      {
+        id: "oaic",
+        title: "2 · OAIC privacy complaint",
+        when: "Only after the company: no reply in about 30 days, or a reply that does not fix it. Written complaint.",
+        open: "https://webform.oaic.gov.au/prod/?entitytype=Complaint&layoutcode=ComplaintWF",
+        paste: "oaic",
+        steps: [
+          "Copy the OAIC pack below first (keep this tab open).",
+          "Open the OAIC form (button). If the form fails, read https://www.oaic.gov.au/privacy/privacy-complaints/lodge-a-privacy-complaint-with-us first.",
+          "Paste your name and contact into their fields.",
+          "Organisation name → paste the company name from your pack.",
+          "What happened → paste the “What happened” block.",
+          "Prior complaint / their response → paste the “What I already sent the company” block (and attach any reply you have).",
+          "Outcome you want → paste the “Outcome I want” block.",
+          "Submit. This page does not lodge for you."
+        ]
+      },
+      {
+        id: "reportcyber",
+        title: "3 · ReportCyber (cybercrime / lockout)",
+        when: "If you believe a crime or cyber incident happened (takeover, fraud, lockout after a change you did not make).",
+        open: "https://www.cyber.gov.au/submit-a-report",
+        paste: "reportcyber",
+        steps: [
+          "Copy the ReportCyber pack.",
+          "Open the submit page. Prefer that page over the app (app failed a check on 15 Nov 2026).",
+          "Choose the path for a cybercrime / incident affecting you.",
+          "Paste the pack into the description. Phone backup: 1300 292 371."
+        ]
+      },
+      {
+        id: "scamwatch",
+        title: "4 · Scamwatch (only if someone tried to “get you back in”)",
+        when: "Use if someone asked for a fee, password, or remote access. Not a police report.",
+        open: "https://portal.scamwatch.gov.au/report-a-scam/",
+        paste: "scamwatch",
+        steps: [
+          "Copy the Scamwatch pack.",
+          "Open the Scamwatch form.",
+          "Paste into “about the scam”. Do not send a plain lockout here if there was no scam approach."
+        ]
+      },
+      {
+        id: "idcare",
+        title: "5 · IDCARE (support, not a regulator)",
+        when: "If you want a person to help you through identity / scam harm. Helpline 1800 595 160.",
+        open: "https://www.idcare.org/",
+        paste: "idcare",
+        steps: [
+          "On idcare.org choose Individual (you are the locked-out person).",
+          "Use Get help / their individual form — not the Large organisation form.",
+          "Paste the IDCARE pack. Say you already have a written record; you are not asking them to recover the account for a fee."
+        ]
+      }
+    ]
   },
   NZ: {
     name: "New Zealand",
-    path: [
-      ["The agency", null, "The Privacy Commissioner says it will not accept a complaint that skipped this step."],
-      ["Office of the Privacy Commissioner", "https://www.privacy.org.nz/your-rights/making-a-complaint-to-the-privacy-commissioner/", "Use the Commissioner's own response-date calculator for an access request. This page does not invent a day count. The Commissioner's page says an investigation queue of at least six months."]
-    ],
-    also: [["Netsafe", "https://netsafe.org.nz/report/scams", "Scams, not a privacy complaint. 0508 638 723."]],
-    unchecked: ["NCSC", "Incident reporting", "Commerce Commission"],
     right: "IPP 6",
-    clock: "Use the Privacy Commissioner's response-date calculator. This page does not invent that date."
+    clock: "Use the Privacy Commissioner's response-date calculator. This page does not invent that date.",
+    channels: [
+      {
+        id: "company",
+        title: "1 · The agency / company (required first)",
+        when: "The Privacy Commissioner will not take a complaint that skipped this.",
+        open: null,
+        paste: "company",
+        steps: ["Copy the company pack.", "Email the organisation. Keep a copy.", "Note the send date on Track it."]
+      },
+      {
+        id: "opc",
+        title: "2 · Privacy Commissioner",
+        when: "After the organisation step failed or had no useful reply. Investigation queues can be 6+ months.",
+        open: "https://www.privacy.org.nz/your-rights/making-a-complaint-to-the-privacy-commissioner/",
+        paste: "regulator",
+        steps: [
+          "Copy the regulator pack.",
+          "Open the Commissioner page. Complete their self-assessment.",
+          "Have evidence ready before you start — their form may not save mid-way.",
+          "Paste the pack where they ask what happened and what you want."
+        ]
+      },
+      {
+        id: "netsafe",
+        title: "3 · Netsafe (scams only)",
+        when: "Online scam approach — not a privacy complaint.",
+        open: "https://netsafe.org.nz/report/scams",
+        paste: "scamwatch",
+        steps: ["Copy the scam pack.", "Open Netsafe report scams.", "Paste. 0508 638 723 if the form fails."]
+      }
+    ]
   },
   UK: {
     name: "United Kingdom",
-    path: [
-      ["The organisation", null, "Complain to them as a data-protection complaint. ICO: follow up on an access request after one month."],
-      ["Information Commissioner's Office", "https://ico.org.uk/make-a-complaint", "Within three months of the last meaningful contact. ICO says it cannot represent you and cannot award compensation."]
-    ],
-    also: [["Action Fraud", "https://www.actionfraud.police.uk/how-to-report-fraud", "Fraud and cyber crime. 0300 123 2040. A report here is not automatically an ICO report."]],
-    unchecked: [],
     right: "UK GDPR Art 15",
-    clock: "ICO: follow up if it has been over one month. Then the ICO within three months of the last meaningful contact."
+    clock: "ICO: follow up if over one month. Then ICO within three months of last meaningful contact.",
+    channels: [
+      {
+        id: "company",
+        title: "1 · The organisation (data-protection complaint)",
+        when: "Always first.",
+        open: null,
+        paste: "company",
+        steps: ["Copy the company pack.", "Email them as a data-protection complaint.", "Keep copies for the ICO."]
+      },
+      {
+        id: "ico",
+        title: "2 · ICO",
+        when: "After the organisation. ICO cannot represent you or award compensation.",
+        open: "https://ico.org.uk/make-a-complaint",
+        paste: "regulator",
+        steps: [
+          "Copy the regulator pack.",
+          "Open Make a complaint.",
+          "Paste what happened and attach your company letter + their reply."
+        ]
+      },
+      {
+        id: "actionfraud",
+        title: "3 · Action Fraud",
+        when: "Fraud / cyber crime. Not an automatic ICO report.",
+        open: "https://www.actionfraud.police.uk/how-to-report-fraud",
+        paste: "reportcyber",
+        steps: ["Copy the incident pack.", "Report online or 0300 123 2040.", "Paste into the description."]
+      }
+    ]
   },
   EU: {
     name: "European Union",
-    path: [
-      ["The organisation", null, "Ask them first."],
-      ["Your national data protection authority", "https://www.edpb.europa.eu/about-edpb/our-members_en", "Not the EDPB itself. Pick the country where you live, work, or where it happened."],
-      ["How to file", "https://www.edpb.europa.eu/contact/file-a-complaint_en", "The EDPB sends you on to that authority."]
-    ],
-    also: [],
-    unchecked: [],
     right: "GDPR Art 15",
-    clock: "The national authority's page sets the reply period. This page does not invent one."
+    clock: "National authority sets the reply period.",
+    channels: [
+      {
+        id: "company",
+        title: "1 · The organisation",
+        when: "Always first.",
+        open: null,
+        paste: "company",
+        steps: ["Copy the company pack.", "Email them. Keep the proof."]
+      },
+      {
+        id: "dpa",
+        title: "2 · Your national data protection authority",
+        when: "After the organisation. Not the EDPB itself.",
+        open: "https://www.edpb.europa.eu/about-edpb/our-members_en",
+        paste: "regulator",
+        steps: [
+          "Open the EDPB members list.",
+          "Pick the authority where you live, work, or where it happened.",
+          "Copy the regulator pack and paste into that authority’s complaint form."
+        ]
+      }
+    ]
   },
   US: {
     name: "United States",
-    path: [
-      ["The company", null, "The letter asks them. This page does not invent a federal access clock. State law differs."],
-      ["FTC ReportFraud", "https://reportfraud.ftc.gov/", "ReportFraud says it cannot resolve your individual report."]
-    ],
-    also: [
-      ["IdentityTheft.gov", "https://www.identitytheft.gov/", "Identity theft. The page warns that a knowingly false report is a crime."],
-      ["IC3", "https://www.ic3.gov/", "Cyber-enabled crime. IC3 warns that impersonators ask for money. Immediate danger: local emergency services, not a form."]
-    ],
-    unchecked: [],
     right: "the access right that applies where you live",
-    clock: "No federal access clock is recorded here. Do not treat 14 days as the statute."
+    clock: "No single federal access clock on this page. Do not treat 14 days as the statute.",
+    channels: [
+      {
+        id: "company",
+        title: "1 · The company",
+        when: "Always first.",
+        open: null,
+        paste: "company",
+        steps: ["Copy the company pack.", "Email support / privacy. Keep copies."]
+      },
+      {
+        id: "ftc",
+        title: "2 · FTC ReportFraud",
+        when: "They collect reports; they say they cannot resolve your individual case.",
+        open: "https://reportfraud.ftc.gov/",
+        paste: "regulator",
+        steps: ["Copy the regulator pack.", "Open ReportFraud.", "Paste into the story fields."]
+      },
+      {
+        id: "ic3",
+        title: "3 · IC3 (cyber-enabled crime)",
+        when: "If it looks like crime. Immediate danger → local emergency services, not the form.",
+        open: "https://www.ic3.gov/",
+        paste: "reportcyber",
+        steps: ["Copy the incident pack.", "File a complaint.", "IC3 will not ask you for money — ignore anyone who does."]
+      }
+    ]
   },
   CA: {
     name: "Canada",
-    path: [
-      ["The organisation", null, "Raise it with them first."],
-      ["Office of the Privacy Commissioner of Canada", "https://www.priv.gc.ca/en/report-a-concern/", "OPC says formal complaints are delayed by several months. The access-page day count was not opened in the 15 Nov check, so it is not stated here."]
-    ],
-    also: [["Canadian Anti-Fraud Centre", null, "Named only. Its page was not confirmed on 15 Nov 2026, so there is no link."]],
-    unchecked: [],
     right: "PIPEDA",
-    clock: "The access day count is not stated here. It was not copied off the official page in the 15 Nov check."
+    clock: "Access day count not copied here (page not opened in the 15 Nov check). OPC formal complaints can take months.",
+    channels: [
+      {
+        id: "company",
+        title: "1 · The organisation",
+        when: "Required first.",
+        open: null,
+        paste: "company",
+        steps: ["Copy the company pack.", "Raise it with their privacy officer. Keep proof."]
+      },
+      {
+        id: "opc",
+        title: "2 · Privacy Commissioner of Canada",
+        when: "After the organisation.",
+        open: "https://www.priv.gc.ca/en/report-a-concern/",
+        paste: "regulator",
+        steps: ["Copy the regulator pack.", "Open Report a concern.", "Follow their steps; paste the pack where asked."]
+      }
+    ]
   }
 };
 
@@ -592,26 +760,85 @@ function viewCost() {
       ${field("What stopped — work, care, travel, a device", "costStopped", state.costStopped, "area")}
     </div>`;
 }
-function viewWhere() {
+function buildTexts() {
   const place = PLACES[state.country] || PLACES.AU;
+  const sit = SITUATIONS.find((s) => s[0] === state.situation);
+  const who = state.yourName || "[your name]";
+  const when = state.lockoutDate || "[date first locked out]";
+  const company = state.company || "[company]";
+  const product = state.product || "[product]";
+  const account = state.account || "[account]";
+  const today = new Date().toISOString().slice(0, 10);
+  const tally = spiralTally();
+  const spiralText = state.spiral.map((loop, i) =>
+    `Loop ${i + 1} (${loop.at || "undated"}) — ${loop.namedHuman ? "A person was named." : "Bot. No named person."}\nBot: ${loop.botSaid}\nI wrote: ${loop.youSaid || "—"}`
+  ).join("\n\n") || "(no bot loops written down yet)";
+  const lines = state.timeline.map((row) =>
+    `${row.at || "undated"} — ${row.kind === "quote" ? "Their words: " : ""}${row.text}`
+  ).join("\n");
+  const cost = [state.costTime && `Time: ${state.costTime}`, state.costMoney && `Money: ${state.costMoney}`, state.costStopped && `What stopped: ${state.costStopped}`].filter(Boolean).join("\n") || "(not filled in)";
+  const ask = `Please reply within 14 days of receiving this. That 14 days is the reply I am asking for. It is not stated here as a statutory period.`;
+  const foot = `General information, not legal advice. I have not asked anyone to recover this account for a fee, a password, or remote access.`;
+  const whatHappened = `I have been locked out of ${product} (company: ${company}) since ${when}. Account: ${account}.\n\nSituation: ${sit ? sit[1] + ". " + sit[2] : ""}\n\nBot death-spiral: ${tally.line}\n${spiralText}\n\n${lines ? "Other notes:\n" + lines : ""}`.trim();
+  const outcome = `I want:\n1) Access restored using a method I already controlled, or a named human at ${company} with a written record of every security change on this account;\n2) The company's records of sign-in changes, login methods added or removed, recovery addresses, mailbox rules or forwarding, and support notes, including who approved any change;\n3) An end to bot-only replies on this lockout.`;
+  const draft = `LOCKOUT REPORT — DRAFT · NOT LODGED\nBuilt with Lockout Reporter (MUZZ AI PTY LTD · Built by Cursor)\nStatus: Draft · not lodged · not a SAR/SMR · not a police report\nPrepared: ${today} (this device's clock)\nReporter: ${who}\nCountry: ${place.name}\n\n=== FACTS (from my record) ===\n${whatHappened}\n\n=== WHAT IT COST ===\n${cost}\n\n=== OUTCOME I WANT ===\n${outcome}\n\n=== CLOCK NOTE ===\n${place.clock}\n\n=== LIMITS ===\n${foot}\nThis draft is for me to paste. It is not a finding that ${company} broke a law. Nothing on this page lodges a report for me.`;
+  const companyPack = `${who}\n${today} (date from this device)\n\n${company}\n\nSubject: Account lockout — security records (${place.right}) and complaint\n\n${whatHappened}\n\nWhat it cost:\n${cost}\n\nI request, under ${place.right} where it applies, your records of sign-in changes, login methods added or removed, recovery addresses, mailbox rules or forwarding, and the support notes on this lockout, including who approved any change.\n\n${outcome}\n\n${ask}\n\n${foot}`;
+  const oaic = {
+    what: whatHappened,
+    prior: `I complained to ${company} on ${state.sentOn || "[date I send / sent the company letter]"}.\n\nI sent them this (copy):\n---\n${companyPack}\n---\nTheir response: ${state.contacts.length ? state.contacts.map((c) => `${c.at} ${c.who}: ${c.note}`).join("\n") : "[paste their reply here, or write: no reply yet]"}.`,
+    outcome
+  };
+  const incident = `Incident summary (Draft · not lodged)\n${who}\n${whatHappened}\n\nCost:\n${cost}\n\n${outcome}\n\n${foot}`;
+  const scam = `Scam / recovery approach report (if someone offered to get me back in)\n${who}\nI am locked out of ${product} (${company}). Someone offered to restore access for a fee, password, or remote access.\n\n${whatHappened}\n\nI did not / will not pay them. Lockout Reporter and IDCARE do not recover accounts that way.\n\n${foot}`;
+  const idcare = `IDCARE support request\n${who}\nI am locked out of ${product} (${company}) since ${when}.\n\nI have written a Lockout Reporter record (browser-only). Bot death-spiral: ${tally.line}.\n\nI need guidance on next steps. I am not asking you to recover the account for a fee or remote access.\n\nShort story:\n${whatHappened}\n\n${foot}`;
+  const regulator = `${who}\n\nSummary for ${place.name} (Draft · not lodged)\n\nCompany: ${company}\nProduct: ${product}\nLocked out since: ${when}\n\n${whatHappened}\n\nI complained to the company first: ${state.sentOn || "[date not yet entered on Track it]"}.\n\n${place.clock}\n\n${outcome}\n\n${foot}`;
+  return { place, draft, company: companyPack, oaic, reportcyber: incident, scamwatch: scam, idcare, regulator };
+}
+function pasteBox(id, text) {
+  return `<div class="paste-mini" id="${id}">${escapeText(text)}</div>
+    <div class="actions no-print"><button type="button" class="pill" data-copy="${id}">Copy this block</button></div>`;
+}
+function channelCard(ch, texts) {
+  const open = ch.open
+    ? `<a class="primary" style="display:inline-block;text-decoration:none;margin:6px 6px 6px 0" href="${ch.open}" target="_blank" rel="noopener noreferrer">Open the official page</a>`
+    : `<span class="note">No form URL — use the company’s own contact page.</span>`;
+  let pack = "";
+  if (ch.paste === "company") pack = pasteBox("pack-" + ch.id, texts.company);
+  else if (ch.paste === "oaic") {
+    pack = `<p class="note">Three blocks for their fields:</p>
+      <p><strong>What happened</strong></p>${pasteBox("pack-" + ch.id + "-what", texts.oaic.what)}
+      <p><strong>What I already sent the company</strong></p>${pasteBox("pack-" + ch.id + "-prior", texts.oaic.prior)}
+      <p><strong>Outcome I want</strong></p>${pasteBox("pack-" + ch.id + "-out", texts.oaic.outcome)}`;
+  } else if (ch.paste === "reportcyber") pack = pasteBox("pack-" + ch.id, texts.reportcyber);
+  else if (ch.paste === "scamwatch") pack = pasteBox("pack-" + ch.id, texts.scamwatch);
+  else if (ch.paste === "idcare") pack = pasteBox("pack-" + ch.id, texts.idcare);
+  else pack = pasteBox("pack-" + ch.id, texts.regulator);
+  const steps = ch.steps.map((s) => `<li class="do">${escapeText(s)}</li>`).join("");
+  return `<article class="channel">
+    <h3>${escapeText(ch.title)}</h3>
+    <p class="when">${escapeText(ch.when)}</p>
+    <div class="actions no-print">${open}</div>
+    <ol>${steps}</ol>
+    ${pack}
+  </article>`;
+}
+function viewWhere() {
+  const texts = buildTexts();
+  const place = texts.place;
   const opts = Object.entries(PLACES).map(([id, p]) =>
     `<option value="${id}" ${id === state.country ? "selected" : ""}>${escapeText(p.name)}</option>`
   ).join("");
-  const items = place.path.map(([name, url, note]) =>
-    `<li><strong>${url ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${escapeText(name)}</a>` : escapeText(name)}</strong> — ${escapeText(note)}</li>`
-  ).join("");
-  const also = place.also.map(([name, url, note]) =>
-    `<li>${url ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${escapeText(name)}</a>` : escapeText(name)} — ${escapeText(note)}</li>`
-  ).join("");
-  const unchecked = place.unchecked.length
-    ? `<h3>Named, not checked</h3><p class="note">No link, until each official page is opened and dated.</p><ul class="plain">${place.unchecked.map((n) => `<li>${escapeText(n)}</li>`).join("")}</ul>`
-    : "";
-  return `<h2>Where to send it</h2>
-    <p class="help">The company first. Then the regulator for the country you pick. A 14-day line in your letter is the date you ask for. It is not the statute.</p>
-    <div class="fields"><label>Country<select id="country">${opts}</select></label></div>
-    <ol class="plain">${items}</ol>
-    ${also ? `<h3>Also</h3><ul class="plain">${also}</ul>` : ""}
-    ${unchecked}
+  const cards = (place.channels || []).map((ch) => channelCard(ch, texts)).join("");
+  return `<h2>Send pack</h2>
+    <p class="draft-banner">Draft · not lodged — like an AML report draft: you copy; you send; this page lodges nothing</p>
+    <p class="help">Fill the earlier steps first. Then work the channels in order. Each card has the official link and the exact text to paste. Hard sites stay hard — the pack is so you are not inventing words in their form.</p>
+    <div class="fields"><label>Country<select id="country">${opts}</select></label>
+    ${field("Your name (used in every pack)", "yourName", state.yourName)}
+    ${field("Date you sent / will send the company letter", "sentOn", state.sentOn, "date")}</div>
+    <h3>Master draft</h3>
+    <p class="note">One story for every form. Copy once; reuse.</p>
+    ${pasteBox("pack-draft", texts.draft)}
+    ${cards}
     <p class="note">${escapeText(place.clock)}</p>`;
 }
 async function viewSeal() {
@@ -637,32 +864,17 @@ async function viewSeal() {
     </div>
     <p class="note">Signing uses a key that stays in this browser. Open the page from this computer (a local address). There is no time-stamping service and no server. A stronger date would be something like RFC 3161, and that needs a server, which this page does not have.</p>`;
 }
-function letterBlock(title, text, id) {
-  return `<h3>${title}</h3><div class="letter" id="${id}">${escapeText(text)}</div>
-    <div class="actions no-print"><button type="button" class="pill" data-copy="${id}">Copy</button></div>`;
-}
 function viewLetters() {
-  const place = PLACES[state.country] || PLACES.AU;
-  const sit = SITUATIONS.find((s) => s[0] === state.situation);
-  const who = state.yourName || "[your name]";
-  const when = state.lockoutDate || "[date]";
-  const company = state.company || "[company]";
-  const tally = spiralTally();
-  const spiralText = state.spiral.map((loop, i) =>
-    `Loop ${i + 1} (${loop.at || "undated"}) — ${loop.namedHuman ? "A person was named." : "Bot. No named person."}\nBot: ${loop.botSaid}\nI wrote: ${loop.youSaid || "—"}`
-  ).join("\n\n");
-  const lines = state.timeline.map((row) => `${row.at || "undated"} — ${row.kind === "quote" ? "Their words: " : ""}${row.text}`).join("\n");
-  const cost = [state.costTime, state.costMoney, state.costStopped].filter(Boolean).join("\n");
-  const ask = `Please reply within 14 days of receiving this letter. That 14 days is the reply I am asking for. It is not stated here as a statutory period.`;
-  const foot = `\n\nGeneral information, not legal advice. I have not asked anyone to recover this account for a fee, a password, or remote access.`;
-  const access = `${who}\n${new Date().toISOString().slice(0, 10)} (date from this device)\n\n${company}\n\nRequest for my security records (${place.right})\n\nI have been locked out of ${state.product || "the service"} since ${when}. The account identifier I use is ${state.account || "[account]"}.\n\nWhat I saw: ${sit ? sit[1] : ""}.\n\nBot death-spiral: ${tally.line}\n${spiralText || "(no bot loops written down)"}\n\n${lines ? "Other notes:\n" + lines + "\n" : ""}\n\nWhat it cost:\n${cost || "(not filled in)"}\n\nPlease give me the records of sign-in changes, login methods added or removed, recovery addresses, mailbox rules or forwarding, and the support notes on this lockout, including who approved any change.\n\n${place.clock}\n\n${ask}${foot}`;
-  const complaint = `${who}\n${new Date().toISOString().slice(0, 10)} (date from this device)\n\n${company}\n\nComplaint\n\nI am locked out. ${sit ? sit[1] + ". " + sit[2] : ""}\n\nBot death-spiral: ${tally.line}\n${spiralText || "(no bot loops written down)"}\n\n${lines ? "Other notes:\n" + lines + "\n" : ""}\nWhat it cost:\n${cost || "(not filled in)"}\n\nI want a named person and a record of every security change. Another bot reply is another loop, not a resolution.\n\n${ask}${foot}`;
-  const regulator = `${who}\n\nSummary for ${place.name}\n\nCompany: ${company}\nProduct: ${state.product || "[product]"}\nLocked out since: ${when}\n\n${sit ? sit[1] : ""}\n\nBot death-spiral: ${tally.line}\n${spiralText || "(no bot loops written down)"}\n\nI complained to the company first: ${state.sentOn || "[date I send it, not yet entered]"}.\n\n${place.clock}\n\nThis summary is for me to paste. It is general information, not legal advice, and it is not a finding that the company broke a law.`;
-  return `<h2>Your letters</h2>
-    <p class="help">Copy what you want to send. Nothing is sent from this page.</p>
-    ${letterBlock("Security-records request", access, "letAccess")}
-    ${letterBlock("Complaint to the company", complaint, "letCompany")}
-    ${letterBlock("Regulator summary", regulator, "letReg")}`;
+  const texts = buildTexts();
+  return `<h2>All drafts</h2>
+    <p class="draft-banner">Draft · not lodged</p>
+    <p class="help">Same packs as Send pack, in one list. Prefer <strong>Send pack</strong> for the guided order. Nothing is sent from this page.</p>
+    <h3>Master draft</h3>${pasteBox("all-draft", texts.draft)}
+    <h3>Company pack</h3>${pasteBox("all-company", texts.company)}
+    <h3>Regulator summary</h3>${pasteBox("all-reg", texts.regulator)}
+    <h3>Incident / cyber pack</h3>${pasteBox("all-cyber", texts.reportcyber)}
+    <h3>Scam / fake-recovery pack</h3>${pasteBox("all-scam", texts.scamwatch)}
+    <h3>IDCARE pack</h3>${pasteBox("all-idcare", texts.idcare)}`;
 }
 function viewTrack() {
   const place = PLACES[state.country] || PLACES.AU;
