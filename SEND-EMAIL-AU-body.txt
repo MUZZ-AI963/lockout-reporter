@@ -1,0 +1,19 @@
+Hello,
+
+I am Murray Clode at MUZZ AI PTY LTD (Australia).
+
+We have built a free Lockout Reporter for people locked out of accounts and stuck in bot help-desk loops. Nothing they type leaves their browser. No account. No payment.
+
+Website: https://muzz-ai963.github.io/lockout-reporter/
+Desk: https://muzz-ai963.github.io/lockout-reporter/app.html
+Agency note: https://muzz-ai963.github.io/lockout-reporter/agency.html
+
+You may link to it or host the files with credit: MUZZ AI PTY LTD, Australia · Built by Cursor.
+
+Not legal advice. Not account recovery. They write the bot death-spiral, ask the company for its security records, then copy Draft · not lodged blocks into official forms. The page lodges nothing.
+
+I am the only contact — please do not expect a Cursor or Claude account to reply.
+
+Murray Clode
+MUZZ AI PTY LTD
+Australia

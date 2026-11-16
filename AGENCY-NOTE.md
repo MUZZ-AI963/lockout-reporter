@@ -3,7 +3,7 @@
 **From:** Murray Clode · MUZZ AI PTY LTD (Australia)  
 **Product:** Lockout Reporter (Locked Out Kit)  
 **Built by:** Cursor  
-**Date:** 15 November 2026  
+**Date:** 15 November 2026 · website + AU send pack 16 November 2026  
 
 ## What it is
 
@@ -33,10 +33,12 @@ Not legal advice. Not an OAIC, ICO, FTC, or police endorsement. Not a finding th
 
 | File | Use |
 |---|---|
-| `index.html` | The tool. Open in a browser. |
+| `index.html` | Website (share this URL). |
+| `app.html` | The reporter desk. |
 | `jurisdictions.json` | Dated regulator links (checked 15 Nov 2026). |
 | `LICENSE` | Free redistribution with credit. |
 | This note | Hand to a colleague who decides whether to link or host. |
+| `SEND-EMAIL-AU.md` | Murray’s AU agency paste pack (Cursor does not send). |
 
 ## Contact
 

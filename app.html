@@ -224,7 +224,7 @@
   </div>
   <section class="howto" aria-labelledby="howto-title">
     <h2 id="howto-title">How and why</h2>
-    <p><strong>Why:</strong> Company help-desks answer with bots. You stay locked out. The loss keeps running. This page turns that loop into a record you hold, then letters for the company and the right regulator.</p>
+    <p><strong>Why:</strong> Company help-desks answer with bots. You stay locked out — or stuck with a product / replacement that never worked (pool gear, appliances, the same loop). The loss keeps running. This page turns that loop into a record you hold, then letters for the company and the right door.</p>
     <p><strong>How:</strong></p>
     <ol>
       <li>Say what happened.</li>
@@ -285,9 +285,13 @@ const SITUATIONS = [
   ["else", "Someone else is in my account", "Password, email, or phone changed. Messages or purchases I didn't make."],
   ["mail", "Mail rules or payment details changed", "Forwarding, a mailbox rule, or a payee's bank details changed without me."],
   ["device", "A device or car is tied to the account", "The app is locked and the thing it controls has stopped working."],
+  ["goods", "A product or replacement that never worked", "Bought a thing (or got a warranty replacement) that failed or never worked. Support answers with bots. Pool, appliance, gear — same loop."],
   ["offer", "Someone offered to get me back in", "For a fee, my password, or remote access to my device."],
   ["other", "Something else", "Locked out, with no clear reason and no person to talk to."]
 ];
+function isGoodsCase() {
+  return state.situation === "goods";
+}
 const PLACES = {
   AU: {
     name: "Australia",
@@ -359,6 +363,34 @@ const PLACES = {
           "On idcare.org choose Individual (you are the locked-out person).",
           "Use Get help / their individual form — not the Large organisation form.",
           "Paste the IDCARE pack. Say you already have a written record; you are not asking them to recover the account for a fee."
+        ]
+      },
+      {
+        id: "accc",
+        title: "Consumer · ACCC guidance + report",
+        when: "Product / replacement never worked. ACCC does not usually resolve your individual case — it uses reports for broader work. Still useful after the company step. Phone 1300 302 502.",
+        open: "https://www.accc.gov.au/about-us/contact-us-or-report-an-issue",
+        paste: "accc",
+        for: ["goods"],
+        steps: [
+          "Read repair / replace / refund: https://www.accc.gov.au/consumers/problem-with-a-product-or-service-you-bought/repair-replace-refund-cancel",
+          "Copy the ACCC pack below.",
+          "Open the ACCC contact / report page. Use their consumer report or enquiry form — not a lockout cyber form.",
+          "Paste the pack. Note: they may send you to your state fair trading agency for resolution."
+        ]
+      },
+      {
+        id: "fairtrading",
+        title: "Consumer · state / territory fair trading",
+        when: "After the company: no useful fix. State and territory consumer agencies can advise and sometimes help negotiate. Pick your state from the ACCC list.",
+        open: "https://www.accc.gov.au/consumers/problem-with-a-product-or-service-you-bought/where-to-go-for-consumer-help",
+        paste: "consumer",
+        for: ["goods"],
+        steps: [
+          "Open the ACCC “where to go” page and choose your state or territory consumer agency.",
+          "Copy the consumer pack.",
+          "Paste into their complaint / enquiry form. Attach receipts and the company letter if asked.",
+          "This page lodges nothing."
         ]
       }
     ]
@@ -712,15 +744,21 @@ function viewWhat() {
     `<button type="button" class="card" data-sit="${id}" aria-pressed="${state.situation === id}">
       <strong>${escapeText(title)}</strong><span>${escapeText(blurb)}</span></button>`
   ).join("");
-  return `<h2>What happened?</h2>
-    <p class="help">Pick the one closest to what you saw. It decides which places you get pointed to. You can change it later.</p>
-    <div class="grid">${cards}</div>
-    <div class="fields">
-      ${field("Company that holds the account", "company", state.company)}
+  const goods = isGoodsCase();
+  const fields = goods
+    ? `${field("Seller or maker (the company you are stuck with)", "company", state.company)}
+      ${field("Product (make / model)", "product", state.product)}
+      ${field("Order, serial, or support case number (if you have one)", "account", state.account)}
+      ${field("Date the product or replacement first failed / never worked", "lockoutDate", state.lockoutDate, "date")}
+      <p class="note span2">Manufacturer warranty ending does not by itself end Australian Consumer Law consumer guarantees (ACCC guidance). This page is general information, not legal advice.</p>`
+    : `${field("Company that holds the account", "company", state.company)}
       ${field("Product or service", "product", state.product)}
       ${field("Account identifier (the email or username on the account)", "account", state.account)}
-      ${field("Date you were first locked out", "lockoutDate", state.lockoutDate, "date")}
-    </div>
+      ${field("Date you were first locked out", "lockoutDate", state.lockoutDate, "date")}`;
+  return `<h2>What happened?</h2>
+    <p class="help">Pick the one closest to what you saw. It decides which places you get pointed to. You can change it later.${goods ? " For a broken product stuck in bot support, use <strong>A product or replacement that never worked</strong>." : ""}</p>
+    <div class="grid">${cards}</div>
+    <div class="fields">${fields}</div>
     ${stepNav()}`;
 }
 function spiralTally() {
@@ -746,7 +784,7 @@ function viewSpiral() {
       <p>${escapeText(tally.line)} Each reply that is not a named person is another turn. The loss keeps running while the bot repeats.</p>
     </div>
     <h2>Write the loop</h2>
-    <p class="help">One turn is: the bot answers, you answer, you are still locked out. Their sentence is a quote. It is not a finding, and it is not a person.</p>
+    <p class="help">One turn is: the bot answers, you answer, you are still stuck${isGoodsCase() ? " (product still broken / pool still untreated)" : " (still locked out)"}. Their sentence is a quote. It is not a finding, and it is not a person.</p>
     ${loops || `<p class="note">Start with the first bot reply. Case numbers, “a specialist will reply”, and a closed ticket with no name all count as a loop.</p>`}
     <div class="fields">
       ${field("Date of this reply", "spDate", "", "date")}
@@ -779,12 +817,13 @@ function viewTimeline() {
     ${stepNav()}`;
 }
 function viewCost() {
+  const goods = isGoodsCase();
   return `<h2>What it cost</h2>
     <p class="help">The letter leads with this. Time, money, and what stopped.</p>
     <div class="fields">
-      ${field("Time you have been locked out", "costTime", state.costTime)}
+      ${field(goods ? "Time without a working product / stuck in support" : "Time you have been locked out", "costTime", state.costTime)}
       ${field("Money, if any", "costMoney", state.costMoney)}
-      ${field("What stopped — work, care, travel, a device", "costStopped", state.costStopped, "area")}
+      ${field(goods ? "What stopped — pool, health, care, work, property at risk" : "What stopped — work, care, travel, a device", "costStopped", state.costStopped, "area")}
     </div>
     ${stepNav()}`;
 }
@@ -792,10 +831,10 @@ function buildTexts() {
   const place = PLACES[state.country] || PLACES.AU;
   const sit = SITUATIONS.find((s) => s[0] === state.situation);
   const who = state.yourName || "[your name]";
-  const when = state.lockoutDate || "[date first locked out]";
+  const when = state.lockoutDate || (isGoodsCase() ? "[date product / replacement first failed]" : "[date first locked out]");
   const company = state.company || "[company]";
   const product = state.product || "[product]";
-  const account = state.account || "[account]";
+  const account = state.account || (isGoodsCase() ? "[order / serial / case]" : "[account]");
   const today = new Date().toISOString().slice(0, 10);
   const tally = spiralTally();
   const spiralText = state.spiral.map((loop, i) =>
@@ -806,21 +845,38 @@ function buildTexts() {
   ).join("\n");
   const cost = [state.costTime && `Time: ${state.costTime}`, state.costMoney && `Money: ${state.costMoney}`, state.costStopped && `What stopped: ${state.costStopped}`].filter(Boolean).join("\n") || "(not filled in)";
   const ask = `Please reply within 14 days of receiving this. That 14 days is the reply I am asking for. It is not stated here as a statutory period.`;
-  const foot = `General information, not legal advice. I have not asked anyone to recover this account for a fee, a password, or remote access.`;
-  const whatHappened = `I have been locked out of ${product} (company: ${company}) since ${when}. Account: ${account}.\n\nSituation: ${sit ? sit[1] + ". " + sit[2] : ""}\n\nBot death-spiral: ${tally.line}\n${spiralText}\n\n${lines ? "Other notes:\n" + lines : ""}`.trim();
-  const outcome = `I want:\n1) Access restored using a method I already controlled, or a named human at ${company} with a written record of every security change on this account;\n2) The company's records of sign-in changes, login methods added or removed, recovery addresses, mailbox rules or forwarding, and support notes, including who approved any change;\n3) An end to bot-only replies on this lockout.`;
-  const draft = `LOCKOUT REPORT — DRAFT · NOT LODGED\nBuilt with Lockout Reporter (MUZZ AI PTY LTD · Built by Cursor)\nStatus: Draft · not lodged · not a SAR/SMR · not a police report\nPrepared: ${today} (this device's clock)\nReporter: ${who}\nCountry: ${place.name}\n\n=== FACTS (from my record) ===\n${whatHappened}\n\n=== WHAT IT COST ===\n${cost}\n\n=== OUTCOME I WANT ===\n${outcome}\n\n=== CLOCK NOTE ===\n${place.clock}\n\n=== LIMITS ===\n${foot}\nThis draft is for me to paste. It is not a finding that ${company} broke a law. Nothing on this page lodges a report for me.`;
-  const companyPack = `${who}\n${today} (date from this device)\n\n${company}\n\nSubject: Account lockout — security records (${place.right}) and complaint\n\n${whatHappened}\n\nWhat it cost:\n${cost}\n\nI request, under ${place.right} where it applies, your records of sign-in changes, login methods added or removed, recovery addresses, mailbox rules or forwarding, and the support notes on this lockout, including who approved any change.\n\n${outcome}\n\n${ask}\n\n${foot}`;
+  const foot = isGoodsCase()
+    ? `General information, not legal advice. I am not asking for remote access to my devices. A manufacturer's warranty ending does not by itself end Australian Consumer Law consumer guarantees (see ACCC repair / replace / refund guidance).`
+    : `General information, not legal advice. I have not asked anyone to recover this account for a fee, a password, or remote access.`;
+  const clockNote = isGoodsCase() && state.country === "AU"
+    ? `Australian Consumer Law consumer guarantees may still apply after a manufacturer's warranty ends. ACCC: repair, replace, refund — checked 16 Nov 2026. This page does not decide whether a failure is major or minor.`
+    : place.clock;
+  let whatHappened;
+  let outcome;
+  let companyPack;
+  if (isGoodsCase()) {
+    whatHappened = `I bought ${product} from / through ${company}. Reference: ${account}.\n\nSituation: ${sit ? sit[1] + ". " + sit[2] : ""}\n\nThe product (or a warranty replacement they sent) has not worked as required since ${when}. I have been stuck in bot / ticket support with no named person who can fix it. The thing the product is meant to look after still needs attention.\n\nBot death-spiral: ${tally.line}\n${spiralText}\n\n${lines ? "Timeline / other notes:\n" + lines : ""}`.trim();
+    outcome = `I want:\n1) A working remedy under the Australian Consumer Law consumer guarantees where they apply — my choice of a refund or a replacement that works (or repair if the problem is minor), within a reasonable time;\n2) A named human at ${company} with written authority on this case — not bot-only replies;\n3) Written records of every support ticket, replacement shipped, and diagnosis they claim, including who approved each step.`;
+    companyPack = `${who}\n${today} (date from this device)\n\n${company}\n\nSubject: Product / replacement never worked — consumer guarantee complaint and named contact\n\n${whatHappened}\n\nWhat it cost:\n${cost}\n\nI rely on the Australian Consumer Law consumer guarantees where they apply. A manufacturer's warranty period ending does not by itself end those guarantees. I ask you to treat this as a major failure if the product cannot be used for its normal purpose and cannot easily be fixed in a reasonable time — or to explain in writing why you say otherwise.\n\n${outcome}\n\n${ask}\n\n${foot}`;
+  } else {
+    whatHappened = `I have been locked out of ${product} (company: ${company}) since ${when}. Account: ${account}.\n\nSituation: ${sit ? sit[1] + ". " + sit[2] : ""}\n\nBot death-spiral: ${tally.line}\n${spiralText}\n\n${lines ? "Other notes:\n" + lines : ""}`.trim();
+    outcome = `I want:\n1) Access restored using a method I already controlled, or a named human at ${company} with a written record of every security change on this account;\n2) The company's records of sign-in changes, login methods added or removed, recovery addresses, mailbox rules or forwarding, and support notes, including who approved any change;\n3) An end to bot-only replies on this lockout.`;
+    companyPack = `${who}\n${today} (date from this device)\n\n${company}\n\nSubject: Account lockout — security records (${place.right}) and complaint\n\n${whatHappened}\n\nWhat it cost:\n${cost}\n\nI request, under ${place.right} where it applies, your records of sign-in changes, login methods added or removed, recovery addresses, mailbox rules or forwarding, and the support notes on this lockout, including who approved any change.\n\n${outcome}\n\n${ask}\n\n${foot}`;
+  }
+  const title = isGoodsCase() ? "LOCKOUT / PRODUCT SUPPORT REPORT — DRAFT · NOT LODGED" : "LOCKOUT REPORT — DRAFT · NOT LODGED";
+  const draft = `${title}\nBuilt with Lockout Reporter (MUZZ AI PTY LTD · Built by Cursor)\nStatus: Draft · not lodged · not a SAR/SMR · not a police report · not a court finding\nPrepared: ${today} (this device's clock)\nReporter: ${who}\nCountry: ${place.name}\n\n=== FACTS (from my record) ===\n${whatHappened}\n\n=== WHAT IT COST ===\n${cost}\n\n=== OUTCOME I WANT ===\n${outcome}\n\n=== CLOCK NOTE ===\n${clockNote}\n\n=== LIMITS ===\n${foot}\nThis draft is for me to paste. It is not a finding that ${company} broke a law. Nothing on this page lodges a report for me.`;
   const oaic = {
     what: whatHappened,
     prior: `I complained to ${company} on ${state.sentOn || "[date I send / sent the company letter]"}.\n\nI sent them this (copy):\n---\n${companyPack}\n---\nTheir response: ${state.contacts.length ? state.contacts.map((c) => `${c.at} ${c.who}: ${c.note}`).join("\n") : "[paste their reply here, or write: no reply yet]"}.`,
     outcome
   };
   const incident = `Incident summary (Draft · not lodged)\n${who}\n${whatHappened}\n\nCost:\n${cost}\n\n${outcome}\n\n${foot}`;
-  const scam = `Scam / recovery approach report (if someone offered to get me back in)\n${who}\nI am locked out of ${product} (${company}). Someone offered to restore access for a fee, password, or remote access.\n\n${whatHappened}\n\nI did not / will not pay them. Lockout Reporter and IDCARE do not recover accounts that way.\n\n${foot}`;
-  const idcare = `IDCARE support request\n${who}\nI am locked out of ${product} (${company}) since ${when}.\n\nI have written a Lockout Reporter record (browser-only). Bot death-spiral: ${tally.line}.\n\nI need guidance on next steps. I am not asking you to recover the account for a fee or remote access.\n\nShort story:\n${whatHappened}\n\n${foot}`;
-  const regulator = `${who}\n\nSummary for ${place.name} (Draft · not lodged)\n\nCompany: ${company}\nProduct: ${product}\nLocked out since: ${when}\n\n${whatHappened}\n\nI complained to the company first: ${state.sentOn || "[date not yet entered on Track it]"}.\n\n${place.clock}\n\n${outcome}\n\n${foot}`;
-  return { place, draft, company: companyPack, oaic, reportcyber: incident, scamwatch: scam, idcare, regulator };
+  const scam = `Scam / recovery approach report (if someone offered to get me back in)\n${who}\nI am dealing with ${product} (${company}). Someone offered to fix it / restore access for a fee, password, or remote access.\n\n${whatHappened}\n\nI did not / will not pay them. Lockout Reporter and IDCARE do not recover accounts that way.\n\n${foot}`;
+  const idcare = `IDCARE support request\n${who}\nI am stuck with ${product} (${company}) since ${when}.\n\nI have written a Lockout Reporter record (browser-only). Bot death-spiral: ${tally.line}.\n\nI need guidance on next steps. I am not asking you to recover an account or fix a product for a fee or remote access.\n\nShort story:\n${whatHappened}\n\n${foot}`;
+  const regulator = `${who}\n\nSummary for ${place.name} (Draft · not lodged)\n\nCompany: ${company}\nProduct: ${product}\nSince: ${when}\n\n${whatHappened}\n\nI complained to the company first: ${state.sentOn || "[date not yet entered on Track it]"}.\n\n${clockNote}\n\n${outcome}\n\n${foot}`;
+  const accc = `${who}\n\nACCC consumer report / enquiry — Draft · not lodged\n\nCompany: ${company}\nProduct: ${product}\nReference: ${account}\nFirst failed / never worked: ${when}\n\n${whatHappened}\n\nCost:\n${cost}\n\n${outcome}\n\nI understand the ACCC may not resolve my individual dispute and may refer me to a state or territory consumer agency. I still want this pattern on the record: bot-only support while a replacement product never worked.\n\n${foot}`;
+  const consumer = `${who}\n\nState / territory consumer agency — Draft · not lodged\n\nCompany: ${company}\nProduct: ${product}\nReference: ${account}\n\n${whatHappened}\n\nCost:\n${cost}\n\nI complained to the company first: ${state.sentOn || "[date not yet entered on Track it]"}.\nTheir response so far: ${state.contacts.length ? state.contacts.map((c) => `${c.at} ${c.who}: ${c.note}`).join("\n") : "[no useful fix / still bots]"}.\n\n${outcome}\n\n${clockNote}\n\n${foot}`;
+  return { place, draft, company: companyPack, oaic, reportcyber: incident, scamwatch: scam, idcare, regulator, accc, consumer, clockNote };
 }
 function pasteBox(id, text) {
   return `<div class="paste-mini" id="${id}">${escapeText(text)}</div>
@@ -837,9 +893,11 @@ function channelCard(ch, texts) {
       <p><strong>What happened</strong></p>${pasteBox("pack-" + ch.id + "-what", texts.oaic.what)}
       <p><strong>What I already sent the company</strong></p>${pasteBox("pack-" + ch.id + "-prior", texts.oaic.prior)}
       <p><strong>Outcome I want</strong></p>${pasteBox("pack-" + ch.id + "-out", texts.oaic.outcome)}`;
-  } else if (ch.paste === "reportcyber") pack = pasteBox("pack-" + ch.id, texts.reportcyber);
+  }   else if (ch.paste === "reportcyber") pack = pasteBox("pack-" + ch.id, texts.reportcyber);
   else if (ch.paste === "scamwatch") pack = pasteBox("pack-" + ch.id, texts.scamwatch);
   else if (ch.paste === "idcare") pack = pasteBox("pack-" + ch.id, texts.idcare);
+  else if (ch.paste === "accc") pack = pasteBox("pack-" + ch.id, texts.accc);
+  else if (ch.paste === "consumer") pack = pasteBox("pack-" + ch.id, texts.consumer);
   else pack = pasteBox("pack-" + ch.id, texts.regulator);
   const steps = ch.steps.map((s) => `<li class="do">${escapeText(s)}</li>`).join("");
   return `<article class="channel">
@@ -856,10 +914,19 @@ function viewWhere() {
   const opts = Object.entries(PLACES).map(([id, p]) =>
     `<option value="${id}" ${id === state.country ? "selected" : ""}>${escapeText(p.name)}</option>`
   ).join("");
-  const cards = (place.channels || []).map((ch) => channelCard(ch, texts)).join("");
+  const goods = isGoodsCase();
+  const channels = (place.channels || []).filter((ch) => {
+    if (ch.for && ch.for.length && ch.for.indexOf(state.situation) === -1) return false;
+    if (goods && (ch.id === "oaic" || ch.id === "reportcyber" || ch.id === "idcare")) return false;
+    if (!goods && (ch.id === "accc" || ch.id === "fairtrading")) return false;
+    return true;
+  });
+  const cards = channels.map((ch) => channelCard(ch, texts)).join("");
   return `<h2>Send pack</h2>
     <p class="draft-banner">Draft · not lodged — like an AML report draft: you copy; you send; this page lodges nothing</p>
-    <p class="help">Fill the earlier steps first. Then work the channels in order. Each card has the official link and the exact text to paste. Hard sites stay hard — the pack is so you are not inventing words in their form.</p>
+    <p class="help">${goods
+      ? "Product path: company first, then ACCC report / state fair trading. Each card has the official link and paste text. This page lodges nothing."
+      : "Fill the earlier steps first. Then work the channels in order. Each card has the official link and the exact text to paste. Hard sites stay hard — the pack is so you are not inventing words in their form."}</p>
     <div class="fields"><label>Country<select id="country">${opts}</select></label>
     ${field("Your name (used in every pack)", "yourName", state.yourName)}
     ${field("Date you sent / will send the company letter", "sentOn", state.sentOn, "date")}</div>
@@ -867,7 +934,7 @@ function viewWhere() {
     <p class="note">One story for every form. Copy once; reuse.</p>
     ${pasteBox("pack-draft", texts.draft)}
     ${cards}
-    <p class="note">${escapeText(place.clock)}</p>
+    <p class="note">${escapeText(texts.clockNote || place.clock)}</p>
     ${stepNav()}`;
 }
 async function viewSeal() {
