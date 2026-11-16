@@ -1,5 +1,5 @@
 /* Lockout Reporter — offline shell for every laptop. */
-const CACHE = "lockout-reporter-v2";
+const CACHE = "lockout-reporter-v3";
 const PRECACHE = [
   "./",
   "./index.html",
@@ -11,6 +11,8 @@ const PRECACHE = [
   "./AGENCY-NOTE.md",
   "./manifest.webmanifest",
   "./icon.svg",
+  "./icon-192.png",
+  "./icon-512.png",
   "./logo-mark.svg",
   "./logo.svg"
 ];

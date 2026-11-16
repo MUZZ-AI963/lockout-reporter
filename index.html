@@ -126,6 +126,7 @@
       <button class="pill" id="install" type="button" hidden>Install on this laptop</button>
     </nav>
   </div>
+  <p id="installHint" class="kicker" style="max-width:52rem;margin:10px auto 0;padding:0 22px;display:none"></p>
 
   <section class="hero" aria-label="Lockout Reporter">
     <div class="brand-row">
@@ -167,17 +168,42 @@
     localStorage.setItem(THEME_KEY, next);
   };
   let deferred;
+  const installBtn = document.getElementById("install");
+  const installHint = document.getElementById("installHint");
+  // Install is for THIS laptop when the browser supports PWA install (usually Chrome / Edge / Chromium).
+  // Firefox on Linux often has no install prompt — bookmark the page instead. Not for "other" laptops.
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferred = e;
-    document.getElementById("install").hidden = false;
+    installBtn.hidden = false;
+    installHint.style.display = "none";
   });
-  document.getElementById("install").onclick = async () => {
-    if (!deferred) return;
-    deferred.prompt();
+  window.addEventListener("appinstalled", () => {
     deferred = null;
-    document.getElementById("install").hidden = true;
+    installBtn.hidden = true;
+    installHint.style.display = "block";
+    installHint.textContent = "Installed on this laptop.";
+  });
+  installBtn.onclick = async () => {
+    if (!deferred) {
+      installHint.style.display = "block";
+      installHint.textContent = "Install isn’t available in this browser. Use Chrome or Edge → menu → Install app / Add to home screen. On Firefox, bookmark this page.";
+      return;
+    }
+    deferred.prompt();
+    try { await deferred.userChoice; } catch (e) { /* ignore */ }
+    deferred = null;
+    installBtn.hidden = true;
   };
+  setTimeout(() => {
+    if (deferred || window.matchMedia("(display-mode: standalone)").matches) return;
+    const ua = navigator.userAgent || "";
+    const isFx = /Firefox\//.test(ua);
+    installHint.style.display = "block";
+    installHint.textContent = isFx
+      ? "Install button needs Chrome or Edge on this laptop. In Firefox: bookmark this page (Ctrl+D). Same free site either way."
+      : "No install prompt yet. In Chrome/Edge try the address-bar install icon, or menu → Install app. Or just bookmark the page.";
+  }, 2500);
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
 </script>
 </body>
