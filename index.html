@@ -92,10 +92,18 @@
   }
   .banner {
     margin-top: 28px; max-width: 34rem;
-    background: #f6f3ec; color: #1c1914; text-align: left;
-    padding: 12px 14px; font-size: 14px;
+    background: #0f7a3a;
+    background: linear-gradient(135deg, #0d6b34 0%, #14964a 55%, #0f7a3a 100%);
+    color: #ffffff; text-align: left;
+    padding: 14px 16px; font-size: 15px; font-weight: 700;
+    border-radius: 8px; line-height: 1.45;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.12);
   }
-  html[data-theme="light"] .banner { background: #1c1914; color: #f6f3ec; }
+  .banner strong { color: #ffffff; font-weight: 800; }
+  html[data-theme="light"] .banner {
+    background: linear-gradient(135deg, #0d6b34 0%, #14964a 55%, #0f7a3a 100%);
+    color: #ffffff;
+  }
   .below {
     max-width: 52rem; margin: 0 auto; padding: 8px 22px 64px;
     border-top: 1px solid var(--line);
