@@ -1,5 +1,5 @@
 /* Lockout Reporter — offline shell for every laptop. */
-const CACHE = "lockout-reporter-v1";
+const CACHE = "lockout-reporter-v2";
 const PRECACHE = [
   "./",
   "./index.html",
@@ -10,7 +10,9 @@ const PRECACHE = [
   "./LICENSE",
   "./AGENCY-NOTE.md",
   "./manifest.webmanifest",
-  "./icon.svg"
+  "./icon.svg",
+  "./logo-mark.svg",
+  "./logo.svg"
 ];
 
 self.addEventListener("install", (event) => {

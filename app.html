@@ -54,6 +54,11 @@
   button { cursor: pointer; }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 22px 22px 48px; }
   header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+  .brand-row { display: flex; align-items: center; gap: 14px; }
+  .brand-mark {
+    width: 56px; height: 56px; border-radius: 14px; flex: 0 0 auto;
+    box-shadow: 0 0 0 1px var(--line);
+  }
   h1 { font-family: Palatino, "Iowan Old Style", Georgia, serif; font-weight: 500; font-size: 42px; margin: 0; letter-spacing: -0.03em; }
   .kicker { margin: 8px 0 0; color: var(--muted); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
   .tools { display: flex; gap: 8px; }
@@ -206,7 +211,10 @@
 <div class="wrap">
   <header>
     <div>
-      <h1>Lockout Reporter</h1>
+      <div class="brand-row">
+        <img class="brand-mark" src="./logo-mark.svg" width="56" height="56" alt="">
+        <h1>Lockout Reporter</h1>
+      </div>
       <p class="kicker">Locked out of an account · Write it down · Send it to the right place</p>
       <p class="free">Free. No account. No payment. MUZZ AI PTY LTD, Australia. Built by Cursor. <a href="./index.html">Website</a></p>
     </div>

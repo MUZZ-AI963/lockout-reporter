@@ -7,6 +7,7 @@
 <meta name="description" content="Free Lockout Reporter — write the bot death-spiral, ask for the company’s records, copy letters for the right doors. Nothing leaves your browser.">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
 <meta name="theme-color" content="#e3943a">
 <meta name="og:title" content="Lockout Reporter">
 <meta name="og:description" content="Locked out · stuck in bots · write it down · send it to the right place. Free. No account.">
@@ -62,6 +63,14 @@
     max-width: 52rem; margin: 0 auto; padding: 48px 22px 28px;
     min-height: calc(100vh - 120px);
     display: flex; flex-direction: column; justify-content: center;
+  }
+  .brand-row {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  }
+  .brand-mark {
+    width: clamp(64px, 12vw, 88px); height: clamp(64px, 12vw, 88px);
+    flex: 0 0 auto; border-radius: 18px;
+    box-shadow: 0 0 0 1px var(--line);
   }
   .brand {
     font-family: Palatino, "Iowan Old Style", Georgia, serif;
@@ -119,7 +128,10 @@
   </div>
 
   <section class="hero" aria-label="Lockout Reporter">
-    <h1 class="brand">Lockout Reporter</h1>
+    <div class="brand-row">
+      <img class="brand-mark" src="./logo-mark.svg" width="88" height="88" alt="">
+      <h1 class="brand">Lockout Reporter</h1>
+    </div>
     <p class="kicker">Your right to a named answer</p>
     <p class="lead">Locked out of an account and stuck in bot help-desks? Write the loop once, ask for the company’s own security records, and take draft letters to the right doors — on any laptop, free.</p>
     <div class="cta">

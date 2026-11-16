@@ -19,7 +19,9 @@
     font: 16px/1.5 "Segoe UI", Helvetica, Arial, sans-serif;
   }
   .wrap { max-width: 40rem; margin: 0 auto; padding: 28px 20px 56px; }
-  h1 { font-family: Palatino, Georgia, serif; font-weight: 500; font-size: 2rem; margin: 0 0 8px; }
+  .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .brand-mark { width: 48px; height: 48px; border-radius: 12px; box-shadow: 0 0 0 1px var(--line); }
+  h1 { font-family: Palatino, Georgia, serif; font-weight: 500; font-size: 2rem; margin: 0; }
   h2 { font-family: Palatino, Georgia, serif; font-weight: 500; font-size: 1.25rem; margin: 1.6rem 0 0.4rem; }
   p, li { color: var(--muted); }
   strong { color: var(--text); }
@@ -44,7 +46,10 @@
 <body>
 <div class="wrap">
   <p><a href="./index.html">← Website</a> · <a href="./app.html">Open the reporter</a></p>
-  <h1>Onboarding</h1>
+  <div class="brand-row">
+    <img class="brand-mark" src="./logo-mark.svg" width="48" height="48" alt="">
+    <h1>Onboarding</h1>
+  </div>
   <p>Free tool from <strong>MUZZ AI PTY LTD, Australia</strong> · Built by Cursor. For anyone locked out of an account and stuck talking to bots.</p>
 
   <div class="warn">
